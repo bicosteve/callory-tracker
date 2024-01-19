@@ -1,20 +1,6 @@
-{{ template "base" }}
-    {{ define "title" }}Home{{end}}
-    {{define "content" }}
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="home.html">Food Tracker</a>
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav mr-auto">
-                    <li class="nav-item"><a href="home.html">Home</a></li>
-                    <li><a href="add_food.html">Add Food Item</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    
+{{ template "base" .}}
+{{ define "title" }} Home {{end}}
+{{define "content" }}
     <div class="container theme-showcase col-sm-6 col-sm-offset-3" role="main">
         <div class="row">
             <div>
@@ -23,12 +9,12 @@
                         <label for="new-day">New Day</label>
                         <input type="date" class="form-control" id="new-day" />
                     </div>
-    
+
                     <button type="submit" class="btn btn-primary">Add</button>
                 </form>
-    
+
                 <div class="page-header"></div>
-    
+
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <h3 class="panel-title">January 28, 2017</h3>

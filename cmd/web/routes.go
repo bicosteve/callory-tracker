@@ -12,7 +12,7 @@ func routes() http.Handler {
 	router := chi.NewRouter()
 
 	// Routes
-	router.Get("/home", getHome)
+	router.Get("/", getHome)
 	router.Get("/food/add", getAddFoodPage)
 	router.Post("/food/add", postFood)
 	router.Get("/food/day", getDayConsumption)

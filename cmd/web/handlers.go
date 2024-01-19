@@ -2,34 +2,55 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
-	"text/template"
+
+	"github.com/bicosteve/callory-tracker/pkg/helpers"
 )
 
-// for handlers
+var files []string
 
 func getHome(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/home" {
+	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
 	}
 
-	templateSet, err := template.ParseFiles("./ui/html/home.page.html")
+	nav, err := helpers.LoadTemplate("./ui/html/partial.nav.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	base, err := helpers.LoadTemplate("./ui/html/layout.base.html")
+	if err != nil {
+		log.Fatal(err)
+
+	}
+
+	home, err := helpers.LoadTemplate("./ui/html/home.page.html")
+	if err != nil {
+		log.Fatal(err)
+
+	}
+
+	files = append(files, nav)
+	files = append(files, base)
+	files = append(files, home)
+
+	ts, err := template.ParseFiles(files...)
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, "Internal error loading home template", 500)
 		return
 	}
 
-	err = templateSet.Execute(w, nil)
+	err = ts.ExecuteTemplate(w, "base", nil)
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, "Internal server error executing template set", 500)
 		return
 	}
-
-	fmt.Println("Welcome, home")
 
 }
 
