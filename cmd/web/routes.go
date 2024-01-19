@@ -8,7 +8,7 @@ import (
 
 // Routes
 
-func routes() http.Handler {
+func (app *application) routes() http.Handler {
 	router := chi.NewRouter()
 
 	// Routes
