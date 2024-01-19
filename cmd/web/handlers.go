@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -41,21 +40,43 @@ func getHome(w http.ResponseWriter, r *http.Request) {
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
 		log.Println(err.Error())
-		http.Error(w, "Internal error loading home template", 500)
+		http.Error(w, "internal error loading home template", 500)
 		return
 	}
 
 	err = ts.ExecuteTemplate(w, "base", nil)
 	if err != nil {
 		log.Println(err.Error())
-		http.Error(w, "Internal server error executing template set", 500)
+		http.Error(w, "internal server error executing template set", 500)
 		return
 	}
 
 }
 
-func getAddFoodPage(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("This is get food")
+func getFoodPage(w http.ResponseWriter, r *http.Request) {
+	nav, _ := helpers.LoadTemplate("./ui/html/partial.nav.html")
+	base, _ := helpers.LoadTemplate("./ui/html/layout.base.html")
+	add, _ := helpers.LoadTemplate("./ui/html/add_food.page.html")
+
+	files = append(files, nav)
+	files = append(files, base)
+	files = append(files, add)
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "internal error parsing templates", 500)
+		return
+	}
+
+	err = ts.ExecuteTemplate(w, "base", nil)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "internal server error executing templates", 500)
+		return
+
+	}
+
 }
 
 func postFood(w http.ResponseWriter, r *http.Request) {
@@ -66,9 +87,29 @@ func postFood(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("This is get food")
 }
 
-func getDayConsumption(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Get day consumption")
+func getDay(w http.ResponseWriter, r *http.Request) {
+	nav, _ := helpers.LoadTemplate("./ui/html/partial.nav.html")
+	base, _ := helpers.LoadTemplate("./ui/html/layout.base.html")
+	day, _ := helpers.LoadTemplate("./ui/html/day.page.html")
+
+	files = append(files, nav)
+	files = append(files, base)
+	files = append(files, day)
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "internal error parsing templates", 500)
+		return
+	}
+
+	err = ts.ExecuteTemplate(w, "base", nil)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "internal error executing templates", 500)
+		return
+	}
+
 }

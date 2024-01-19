@@ -13,9 +13,9 @@ func routes() http.Handler {
 
 	// Routes
 	router.Get("/", getHome)
-	router.Get("/food/add", getAddFoodPage)
-	router.Post("/food/add", postFood)
-	router.Get("/food/day", getDayConsumption)
+	router.Get("/food/add", getFoodPage)
+	router.Get("/food/day", getDay)
+	router.Post("/food/post", postFood)
 
 	return router
 }
