@@ -19,3 +19,12 @@ func LoadEnv(name string) (string, error) {
 
 	return file, nil
 }
+
+func LoadTemplates(dir string) (string, error) {
+	path, err := filepath.Abs(dir)
+	if err != nil {
+		return "", err
+	}
+
+	return path, nil
+}
