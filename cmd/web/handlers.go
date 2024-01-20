@@ -2,7 +2,6 @@ package main
 
 import (
 	"html/template"
-	"log"
 	"net/http"
 
 	"github.com/bicosteve/callory-tracker/pkg/helpers"
@@ -10,26 +9,30 @@ import (
 
 var files []string
 
-func getHome(w http.ResponseWriter, r *http.Request) {
+func (app *application) getHome(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		http.NotFound(w, r)
+		app.notFound(w)
 		return
 	}
 
-	nav, err := helpers.LoadTemplate("./ui/html/partial.nav.html")
+	nav, err := helpers.LoadTemplate("./ui/html/nav.partial.html")
 	if err != nil {
-		log.Fatal(err)
+		// return error if partial not found
+		app.errorLog.Printf(err.Error())
+		return
 	}
 
 	base, err := helpers.LoadTemplate("./ui/html/layout.base.html")
 	if err != nil {
-		log.Fatal(err)
+		app.serverError(w, err)
+		return
 
 	}
 
 	home, err := helpers.LoadTemplate("./ui/html/home.page.html")
 	if err != nil {
-		log.Fatal(err)
+		app.serverError(w, err)
+		return
 
 	}
 
@@ -39,22 +42,20 @@ func getHome(w http.ResponseWriter, r *http.Request) {
 
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "internal error loading home template", 500)
+		app.serverError(w, err)
 		return
 	}
 
 	err = ts.ExecuteTemplate(w, "base", nil)
 	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "internal server error executing template set", 500)
+		app.serverError(w, err) // serverError() helper
 		return
 	}
 
 }
 
-func getFoodPage(w http.ResponseWriter, r *http.Request) {
-	nav, _ := helpers.LoadTemplate("./ui/html/partial.nav.html")
+func (app *application) getFoodPage(w http.ResponseWriter, r *http.Request) {
+	nav, _ := helpers.LoadTemplate("./ui/html/nav.partial.html")
 	base, _ := helpers.LoadTemplate("./ui/html/layout.base.html")
 	add, _ := helpers.LoadTemplate("./ui/html/add_food.page.html")
 
@@ -64,33 +65,32 @@ func getFoodPage(w http.ResponseWriter, r *http.Request) {
 
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "internal error parsing templates", 500)
+		app.serverError(w, err)
 		return
 	}
 
 	err = ts.ExecuteTemplate(w, "base", nil)
 	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "internal server error executing templates", 500)
+		app.serverError(w, err)
 		return
 
 	}
 
 }
 
-func postFood(w http.ResponseWriter, r *http.Request) {
+func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.Header().Set("Allow", "POST")
-		w.WriteHeader(405)
-		w.Write([]byte("Method Not Allowed"))
+		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}
 
+	w.Write([]byte("Post foods"))
+
 }
 
-func getDay(w http.ResponseWriter, r *http.Request) {
-	nav, _ := helpers.LoadTemplate("./ui/html/partial.nav.html")
+func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
+	nav, _ := helpers.LoadTemplate("./ui/html/nav.partial.html")
 	base, _ := helpers.LoadTemplate("./ui/html/layout.base.html")
 	day, _ := helpers.LoadTemplate("./ui/html/day.page.html")
 
@@ -100,15 +100,13 @@ func getDay(w http.ResponseWriter, r *http.Request) {
 
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "internal error parsing templates", 500)
+		app.serverError(w, err)
 		return
 	}
 
 	err = ts.ExecuteTemplate(w, "base", nil)
 	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "internal error executing templates", 500)
+		app.serverError(w, err)
 		return
 	}
 

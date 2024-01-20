@@ -6,16 +6,13 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-// Routes
-
-func routes() http.Handler {
+func (app *application) routes() http.Handler {
 	router := chi.NewRouter()
-
 	// Routes
-	router.Get("/", getHome)
-	router.Get("/food/add", getFoodPage)
-	router.Get("/food/day", getDay)
-	router.Post("/food/post", postFood)
+	router.Get("/", app.getHome)
+	router.Get("/food/add", app.getFoodPage)
+	router.Get("/food/day", app.getDay)
+	router.Post("/food/post", app.postFood)
 
 	return router
 }
