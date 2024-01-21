@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -40,6 +41,22 @@ func main() {
 	if port == "" {
 		port = ":4000"
 	}
+
+	dbUser := os.Getenv("DBUSER")
+	dbName := os.Getenv("DBNAME")
+	dbHost := os.Getenv("DBHOST")
+	dbPassword := os.Getenv("DBPASSWORD")
+	dbPort := os.Getenv("DBPORT")
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", dbUser, dbPassword, dbHost, dbPort, dbName)
+
+	db, err := openDB(dsn)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
+	defer db.Close()
+	// closes the db connection pool before main func exits
 
 	htmlDir, err := helpers.LoadTemplates("./ui/html")
 	if err != nil {
