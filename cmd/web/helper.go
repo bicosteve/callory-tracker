@@ -1,12 +1,9 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 	"runtime/debug"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 // serverError() writes error messsage and trace to the error line
@@ -25,18 +22,4 @@ func (app *application) clientError(w http.ResponseWriter, status int) {
 // notFound() returns 404 not found response to user
 func (app *application) notFound(w http.ResponseWriter) {
 	app.clientError(w, http.StatusNotFound)
-}
-
-func openDB(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("mysql", dsn)
-	if err != nil {
-		return nil, err
-	}
-
-	err = db.Ping()
-	if err != nil {
-		return nil, err
-	}
-
-	return db, nil
 }

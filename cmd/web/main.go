@@ -7,7 +7,9 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/bicosteve/callory-tracker/pkg/db"
 	"github.com/bicosteve/callory-tracker/pkg/helpers"
+	"github.com/bicosteve/callory-tracker/pkg/models/mysql"
 	"github.com/joho/godotenv"
 )
 
@@ -15,6 +17,7 @@ type application struct {
 	errorLog      *log.Logger
 	infoLog       *log.Logger
 	templateCache map[string]*template.Template
+	foods         *mysql.FoodModel
 }
 
 func main() {
@@ -50,7 +53,7 @@ func main() {
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", dbUser, dbPassword, dbHost, dbPort, dbName)
 
-	db, err := openDB(dsn)
+	db, err := db.OpenDB(dsn)
 	if err != nil {
 		errorLog.Fatal(err)
 	}
@@ -74,6 +77,7 @@ func main() {
 		errorLog:      errorLog,
 		infoLog:       infoLog,
 		templateCache: templatesCache,
+		foods:         &mysql.FoodModel{DB: db},
 	}
 
 	serve := &http.Server{

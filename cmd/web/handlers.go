@@ -85,6 +85,8 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// id, err := app.foods.InsertFood()
+
 	w.Write([]byte("Post foods"))
 
 }
