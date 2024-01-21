@@ -6,7 +6,9 @@ CREATE TABLE foods (
   fat INT NOT NULL, 
   calories INT NOT NULL, 
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  userId INT NOT NULL, 
+  FOREIGN KEY (userId) REFERENCES user(id)
 );
 
 CREATE INDEX idx_foods_created ON foods(created_at);

@@ -11,10 +11,10 @@ type FoodModel struct {
 }
 
 // InsertFood(): insert food into db
-func (f *FoodModel) InsertFood(name string, protein int, carbohydrates int, fat int, calories int) (int, error) {
-	stm := `INSERT INTO foods (name, protein, carbohydrates,fat,calories,created_at,update_at) VALUES (?,?,?,?,?,UTC_TIMESTAMP(),UTC_TIMESTAMP())`
+func (f *FoodModel) InsertFood(name string, protein int, carbohydrates int, fat int, calories int, userId int) (int, error) {
+	stm := `INSERT INTO foods (name, protein, carbohydrates,fat,calories,created_at,update_at) VALUES (?,?,?,?,?,UTC_TIMESTAMP(),UTC_TIMESTAMP(),?)`
 
-	result, err := f.DB.Exec(stm, name, protein, carbohydrates, fat, calories)
+	result, err := f.DB.Exec(stm, name, protein, carbohydrates, fat, calories, userId)
 	if err != nil {
 		return 0, nil
 	}
@@ -26,6 +26,28 @@ func (f *FoodModel) InsertFood(name string, protein int, carbohydrates int, fat 
 	}
 
 	return int(id), nil
+}
+
+func (f *FoodModel) GetFood(foodId, userId int) (*models.Food, error) {
+	stm := `SELECT * FROM foods WHERE id = ? AND userId = ?`
+	row := f.DB.QueryRow(stm, foodId, userId)
+
+	food := &models.Food{}
+
+	err := row.Scan(&food.ID, &food.Name, &food.Protein,
+		&food.Carbohydrates, &food.Fat, &food.Calories,
+		&food.CreatedAt, &food.UpdatedAt)
+
+	if err == sql.ErrNoRows {
+		return nil, models.ErrNoRecord
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return food, nil
+
 }
 
 func (f *FoodModel) GetFoods(userid int) ([]*models.Food, error) {
@@ -61,4 +83,35 @@ func (f *FoodModel) GetFoods(userid int) ([]*models.Food, error) {
 	}
 
 	return foods, nil
+}
+
+func (f *FoodModel) UpdateFood(foodId, userId int) (int, error) {
+	stm := `UPDATE foods SET name = ?, protein = ?, carbohydrates = ?, fat = ?, calory = ?, updated_at = UTC_TIMESTAMP()  WHERE id = ? AND userId = ?`
+	result, err := f.DB.Exec(stm, foodId, userId)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
+
+}
+
+func (f *FoodModel) DeleteFood(foodId, userId int) (int, error) {
+	stm := "DELETE FROM foods WHERE id = ? AND userId = ?"
+	result, err := f.DB.Exec(stm, foodId, userId)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
 }
