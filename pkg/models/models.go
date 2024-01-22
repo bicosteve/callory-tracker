@@ -16,4 +16,15 @@ type Food struct {
 	Calories      int       `json:"calories"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
+	UserID        int       `json:"userId"`
+}
+
+type User struct {
+	ID              int       `json:"id"`
+	Username        string    `json:"username"`
+	Email           string    `json:"email"`
+	Password        string    `json:"password"`
+	ConfirmPassword string    `json:"confirm_password"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
 }
