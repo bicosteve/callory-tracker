@@ -6,6 +6,8 @@ import (
 )
 
 var ErrNoRecord = errors.New("models: no matching record found")
+var ErrDuplicateEmail = errors.New("models: user already exists")
+var ErrorInvalidCredentials = errors.New("models: incorrect password or email")
 
 type Food struct {
 	ID            int       `json:"id"`
