@@ -18,6 +18,7 @@ type application struct {
 	infoLog       *log.Logger
 	templateCache map[string]*template.Template
 	foods         *mysql.FoodModel
+	users         *mysql.UserModel
 }
 
 func main() {
@@ -78,6 +79,7 @@ func main() {
 		infoLog:       infoLog,
 		templateCache: templatesCache,
 		foods:         &mysql.FoodModel{DB: db},
+		users:         &mysql.UserModel{DB: db},
 	}
 
 	serve := &http.Server{
