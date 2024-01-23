@@ -1,8 +1,11 @@
 package main
 
 import (
+	"errors"
+	"github.com/bicosteve/callory-tracker/pkg/models"
 	"html/template"
 	"net/http"
+	"strconv"
 
 	"github.com/bicosteve/callory-tracker/pkg/helpers"
 )
@@ -109,6 +112,30 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
+	foodID, err := strconv.Atoi(r.URL.Query().Get("foodId"))
+	userID, err := strconv.Atoi(r.URL.Query().Get("userId"))
+
+	if err != nil || foodID < 1 {
+		app.notFound(w)
+		return
+	}
+
+	if err != nil || userID < 1 {
+		app.notFound(w)
+		return
+	}
+
+	food, err := app.foods.GetFood(foodID, userID)
+	if errors.Is(err, models.ErrNoRecord) {
+		app.notFound(w)
+		return
+	}
+
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
 	nav, _ := helpers.LoadTemplate("./ui/html/nav.partial.html")
 	base, _ := helpers.LoadTemplate("./ui/html/layout.base.html")
 	day, _ := helpers.LoadTemplate("./ui/html/day.page.html")
@@ -123,7 +150,7 @@ func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ts.ExecuteTemplate(w, "base", nil)
+	err = ts.ExecuteTemplate(w, "base", food)
 	if err != nil {
 		app.serverError(w, err)
 		return

@@ -6,7 +6,7 @@
             <div>
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h3 class="panel-title">January 28, 2017</h3>
+                        <h3 class="panel-title">{{ .CreatedAt}}</h3>
                     </div>
 
                     <div class="panel-body">
@@ -48,21 +48,24 @@
 
                     <div class="panel-body">
                         <ul class="nav nav-pills" role="tablist">
-                            <li class="active"><a>Pizza</a></li>
+                            <li class="active"><a>{{ .Meal}}</a></li>
                             <li>
-                                <a>Protein: <span class="badge">100</span></a>
+                                <a>Protein: <span class="badge">{{ .Name}}</span></a>
+                            </li>
+                            <li>
+                                <a>Protein: <span class="badge">{{ .Protein}}</span></a>
                             </li>
                             <li>
                                 <a
                                 >Carbohydates:
-                                    <span class="badge">200</span></a
+                                    <span class="badge">{{ .Carbohydrates}}</span></a
                                 >
                             </li>
                             <li>
-                                <a>Fat: <span class="badge">50</span></a>
+                                <a>Fat: <span class="badge">{{ .Fat}}</span></a>
                             </li>
                             <li>
-                                <a>Calories: <span class="badge">1650</span></a>
+                                <a>Calories: <span class="badge">{{ .Calories}}</span></a>
                             </li>
                         </ul>
                     </div>
