@@ -4,6 +4,7 @@ import (
 	"github.com/bicosteve/callory-tracker/pkg/models"
 	"html/template"
 	"path/filepath"
+	"time"
 )
 
 /*
@@ -14,7 +15,9 @@ This file contains all the methods related to template functionalities.
 functions -> object that contains string keyed map for look up between the name
 of custom template functions
 */
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"neatDate": neatDate,
+}
 
 // templateData struct will hold any dynamic data that we want to pass to HTM Templates
 type templateData struct {
@@ -42,8 +45,13 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 		// assign it to the name variable
 		name := filepath.Base(page)
 
-		// Parse the page template file in to a template set
-		ts, err := template.ParseFiles(page)
+		/*
+			1. Parse the page template file in to a template set
+			2. Register template.FuncMap on template set before calling ParseFiles
+			- Use template.New to create empty template set, use the Funcs() method to register
+			the template.FuncMap and parse the files as normal
+		*/
+		ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 		if err != nil {
 			return nil, err
 
@@ -68,4 +76,9 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 	}
 
 	return cache, nil
+}
+
+// neatDate -> formats the date to neat readable date
+func neatDate(t time.Time) string {
+	return t.Format("Jan 02, 2006")
 }
