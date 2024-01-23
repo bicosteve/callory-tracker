@@ -18,9 +18,10 @@ var functions = template.FuncMap{}
 
 // templateData struct will hold any dynamic data that we want to pass to HTM Templates
 type templateData struct {
-	User  *models.User
-	Food  *models.Food
-	Foods []*models.Food
+	User        *models.User
+	Food        *models.Food
+	Foods       []*models.Food
+	CurrentYear int
 }
 
 // Used for template caching when the application starts

@@ -3,11 +3,8 @@ package main
 import (
 	"errors"
 	"github.com/bicosteve/callory-tracker/pkg/models"
-	"html/template"
 	"net/http"
 	"strconv"
-
-	"github.com/bicosteve/callory-tracker/pkg/helpers"
 )
 
 var files []string
@@ -33,29 +30,7 @@ func (app *application) getHome(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) getFoodPage(w http.ResponseWriter, r *http.Request) {
-	//nav, _ := helpers.LoadTemplate("./ui/html/nav.partial.html")
-	//base, _ := helpers.LoadTemplate("./ui/html/layout.base.html")
-	//add, _ := helpers.LoadTemplate("./ui/html/add_food.page.html")
-	//
-	//files = append(files, nav)
-	//files = append(files, base)
-	//files = append(files, add)
-	//
-	//ts, err := template.ParseFiles(files...)
-	//if err != nil {
-	//	app.serverError(w, err)
-	//	return
-	//}
-	//
-	//err = ts.ExecuteTemplate(w, "base", nil)
-	//if err != nil {
-	//	app.serverError(w, err)
-	//	return
-	//
-	//}
-
 	app.renderATemplate(w, r, "add_food.page.html", nil)
-
 }
 
 func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
@@ -101,7 +76,6 @@ func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
 	}
 
 	food, err := app.foods.GetFood(foodID, userID)
-	data := &templateData{Food: food}
 	if errors.Is(err, models.ErrNoRecord) {
 		app.notFound(w)
 		return
@@ -112,57 +86,23 @@ func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	nav, _ := helpers.LoadTemplate("./ui/html/nav.partial.html")
-	base, _ := helpers.LoadTemplate("./ui/html/layout.base.html")
-	day, _ := helpers.LoadTemplate("./ui/html/day.page.html")
-
-	files = append(files, nav)
-	files = append(files, base)
-	files = append(files, day)
-
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	err = ts.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
+	app.renderATemplate(w, r, "day.page.html", &templateData{Food: food})
 
 }
 
+func (app *application) getRegisterPage(w http.ResponseWriter, r *http.Request) {
+	app.renderATemplate(w, r, "register.page.html", nil)
+}
+
 func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
-	nav, _ := helpers.LoadTemplate("./ui/html/nav.partial.html")
-	base, _ := helpers.LoadTemplate("./ui/html/layout.base.html")
-	register, _ := helpers.LoadTemplate("./ui/html/register.page.html")
-
-	files = append(files, nav)
-	files = append(files, base)
-	files = append(files, register)
-
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
 	username := "Bix"
 	email := "bix@bix.com"
 	password := "12345"
 
-	err = app.users.RegisterUser(username, email, password)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
+	err := app.users.RegisterUser(username, email, password)
 
-	err = ts.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
+	_ = err
+
+	app.renderATemplate(w, r, "register.page.html", nil)
 
 }

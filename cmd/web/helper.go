@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"runtime/debug"
+	"time"
 )
 
 // serverError() writes error messages and trace to the error line
@@ -53,11 +54,14 @@ func (app *application) renderATemplate(
 
 	buffer := new(bytes.Buffer)
 	/*
-		write templates to buffer instead of directly to http.ResponseWriter
+		1. write templates to buffer instead of directly to http.ResponseWriter
 		check for error and returns it if it exists.
 		prevents run time errors to leak to ResponseWriter
+
+		2. Execute template set, passing the dynamic data with current year injected
 	*/
-	err := ts.Execute(buffer, data)
+
+	err := ts.Execute(buffer, app.defaultTemplateData(data, r)) //
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -65,4 +69,21 @@ func (app *application) renderATemplate(
 
 	// Write the contents of buffer to http.ResponseWriter
 	buffer.WriteTo(w)
+}
+
+/*
+defaultTemplateData -> takes pointer to templateData struct
+1. Adds the current year to the CurrentYear field
+
+Returns the pointer templateData
+*/
+func (app *application) defaultTemplateData(
+	td *templateData, r *http.Request,
+) *templateData {
+	if td == nil {
+		td = &templateData{}
+	}
+
+	td.CurrentYear = time.Now().Year()
+	return td
 }

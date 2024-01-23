@@ -14,6 +14,8 @@ func (app *application) routes() http.Handler {
 	router.Get("/food/day", app.getDay)
 	router.Post("/food/add", app.postFood)
 
+	// User register
+	router.Get("/user/register", app.getRegisterPage)
 	router.Post("/user/register", app.registerUser)
 
 	return router
