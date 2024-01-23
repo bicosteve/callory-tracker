@@ -1,12 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/bicosteve/callory-tracker/pkg/db"
 	"github.com/bicosteve/callory-tracker/pkg/helpers"
+	"github.com/bicosteve/callory-tracker/pkg/models/mysql"
 	"github.com/joho/godotenv"
 )
 
@@ -14,6 +17,8 @@ type application struct {
 	errorLog      *log.Logger
 	infoLog       *log.Logger
 	templateCache map[string]*template.Template
+	foods         *mysql.FoodModel
+	users         *mysql.UserModel
 }
 
 func main() {
@@ -41,6 +46,22 @@ func main() {
 		port = ":4000"
 	}
 
+	dbUser := os.Getenv("DBUSER")
+	dbName := os.Getenv("DBNAME")
+	dbHost := os.Getenv("DBHOST")
+	dbPassword := os.Getenv("DBPASSWORD")
+	dbPort := os.Getenv("DBPORT")
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", dbUser, dbPassword, dbHost, dbPort, dbName)
+
+	db, err := db.OpenDB(dsn)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
+	defer db.Close()
+	// closes the db connection pool before main func exits
+
 	htmlDir, err := helpers.LoadTemplates("./ui/html")
 	if err != nil {
 		errorLog.Fatal(err.Error())
@@ -57,6 +78,8 @@ func main() {
 		errorLog:      errorLog,
 		infoLog:       infoLog,
 		templateCache: templatesCache,
+		foods:         &mysql.FoodModel{DB: db},
+		users:         &mysql.UserModel{DB: db},
 	}
 
 	serve := &http.Server{

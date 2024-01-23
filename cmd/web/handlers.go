@@ -9,6 +9,8 @@ import (
 
 var files []string
 
+const cal = 4
+
 func (app *application) getHome(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		app.notFound(w)
@@ -85,7 +87,24 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	meal := "lunch"
+	name := "pizza"
+	protein := 5
+	carbohydrates := 20
+	fat := 10
+	calories := (protein * cal) + (carbohydrates * cal) + (fat * cal)
+	userId := 1
+
+	id, err := app.foods.InsertFood(meal, name, protein, carbohydrates, fat, calories, userId)
+
+	if err != nil {
+		app.serverError(w, err)
+		app.errorLog.Println(err)
+		return
+	}
+
 	w.Write([]byte("Post foods"))
+	app.infoLog.Println(id)
 
 }
 
@@ -99,6 +118,39 @@ func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
 	files = append(files, day)
 
 	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	err = ts.ExecuteTemplate(w, "base", nil)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+}
+
+func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
+	nav, _ := helpers.LoadTemplate("./ui/html/nav.partial.html")
+	base, _ := helpers.LoadTemplate("./ui/html/layout.base.html")
+	register, _ := helpers.LoadTemplate("./ui/html/register.page.html")
+
+	files = append(files, nav)
+	files = append(files, base)
+	files = append(files, register)
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	username := "Bix"
+	email := "bix@bix.com"
+	password := "12345"
+
+	err = app.users.RegisterUser(username, email, password)
 	if err != nil {
 		app.serverError(w, err)
 		return
