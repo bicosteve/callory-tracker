@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/bicosteve/callory-tracker/pkg/models"
 	"html/template"
 	"path/filepath"
 )
@@ -10,9 +11,17 @@ This file contains all the methods related to template functionalities.
 */
 
 /*
-functions -> object that contains string keyed map for look up between the name of custom template functions
+functions -> object that contains string keyed map for look up between the name
+of custom template functions
 */
 var functions = template.FuncMap{}
+
+// templateData struct will hold any dynamic data that we want to pass to HTM Templates
+type templateData struct {
+	User  *models.User
+	Food  *models.Food
+	Foods []*models.Food
+}
 
 func loadTemplateCache(dir string) (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}

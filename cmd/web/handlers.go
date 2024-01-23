@@ -20,6 +20,16 @@ func (app *application) getHome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userID := 1
+
+	foods, err := app.foods.GetFoods(userID)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	data := &templateData{Foods: foods}
+
 	nav, err := helpers.LoadTemplate("./ui/html/nav.partial.html")
 	if err != nil {
 		// return error if partial not found
@@ -51,7 +61,8 @@ func (app *application) getHome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ts.ExecuteTemplate(w, "base", nil)
+	// adding data foods on the template
+	err = ts.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		app.serverError(w, err) // serverError() helper
 		return
@@ -126,6 +137,7 @@ func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
 	}
 
 	food, err := app.foods.GetFood(foodID, userID)
+	data := &templateData{Food: food}
 	if errors.Is(err, models.ErrNoRecord) {
 		app.notFound(w)
 		return
@@ -150,7 +162,7 @@ func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ts.ExecuteTemplate(w, "base", food)
+	err = ts.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		app.serverError(w, err)
 		return

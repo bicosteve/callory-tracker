@@ -21,9 +21,8 @@ func (f *FoodModel) InsertFood(
 				(meal, name, protein, carbohydrate,fat,calories,created_at,updated_at,userId) 
 			VALUES (?,?,?,?,?,?,NOW(),NOW(),?)`
 
-	result, err := f.DB.Exec(stm, strings.Title(meal), name,
-		protein, carbohydrate, fat, calories, userId,
-	)
+	result, err := f.DB.Exec(stm, strings.Title(meal), strings.Title(name),
+		protein, carbohydrate, fat, calories, userId)
 	if err != nil {
 		return 0, err
 	}
@@ -76,8 +75,8 @@ func (f *FoodModel) GetFoods(userid int) ([]*models.Food, error) {
 		f := &models.Food{}
 
 		err = rows.Scan(
-			&f.ID, &f.Name, &f.Protein, &f.Carbohydrates,
-			&f.Fat, &f.Calories, &f.CreatedAt, &f.UpdatedAt,
+			&f.ID, &f.Meal, &f.Name, &f.Protein, &f.Carbohydrates,
+			&f.Fat, &f.Calories, &f.CreatedAt, &f.UpdatedAt, &f.UserID,
 		)
 
 		if err != nil {

@@ -6,19 +6,18 @@
             <div>
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h3 class="panel-title">{{ .CreatedAt}}</h3>
+                        <h3 class="panel-title">{{ .Food.CreatedAt}}</h3>
                     </div>
 
                     <div class="panel-body">
                         <form method="POST" action="/">
                             <div class="form-group">
-                                <select class="form-control">
-                                    <option>1</option>
-                                </select>
+                                <label for="day">Select Date</label>
+                                <input class="form-control" type="date" name="day" id="day">
                             </div>
 
                             <button type="submit" class="btn btn-primary">
-                                Add
+                                Calculate
                             </button>
                         </form>
 
@@ -46,29 +45,33 @@
 
                     <div class="page-header"></div>
 
-                    <div class="panel-body">
-                        <ul class="nav nav-pills" role="tablist">
-                            <li class="active"><a>{{ .Meal}}</a></li>
-                            <li>
-                                <a>Protein: <span class="badge">{{ .Name}}</span></a>
-                            </li>
-                            <li>
-                                <a>Protein: <span class="badge">{{ .Protein}}</span></a>
-                            </li>
-                            <li>
-                                <a
-                                >Carbohydates:
-                                    <span class="badge">{{ .Carbohydrates}}</span></a
-                                >
-                            </li>
-                            <li>
-                                <a>Fat: <span class="badge">{{ .Fat}}</span></a>
-                            </li>
-                            <li>
-                                <a>Calories: <span class="badge">{{ .Calories}}</span></a>
-                            </li>
-                        </ul>
-                    </div>
+                    {{ with .Food}}
+                        <div class="panel-body">
+                            <ul class="nav nav-pills" role="tablist">
+                                <li class="active"><a>{{ .Meal}}</a></li>
+                                <li>
+                                    <a>Name: <span class="badge">{{ .Name}}</span></a>
+                                </li>
+                                <li>
+                                    <a>Protein: <span class="badge">{{ .Protein}}</span></a>
+                                </li>
+                                <li>
+                                    <a
+                                    >Carbohydates:
+                                        <span class="badge">{{ .Carbohydrates}}</span></a
+                                    >
+                                </li>
+                                <li>
+                                    <a>Fat: <span class="badge">{{ .Fat}}</span></a>
+                                </li>
+                                <li>
+                                    <a>Calories: <span class="badge">{{ .Calories}}</span></a>
+                                </li>
+                            </ul>
+                        </div>
+                    {{end}}
+
+
                 </div>
             </div>
         </div>
