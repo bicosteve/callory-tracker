@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"strings"
+	"time"
 
 	"github.com/bicosteve/callory-tracker/pkg/models"
 )
@@ -37,7 +38,7 @@ func (f *FoodModel) InsertFood(
 }
 
 func (f *FoodModel) GetFood(foodId, userId int) (*models.Food, error) {
-	stm := `SELECT * FROM foods WHERE id = ? AND userId = ? LIMIT 10`
+	stm := `SELECT * FROM foods WHERE id = ? AND userId = ? LIMIT 1`
 	row := f.DB.QueryRow(stm, foodId, userId)
 
 	food := &models.Food{}
@@ -57,7 +58,23 @@ func (f *FoodModel) GetFood(foodId, userId int) (*models.Food, error) {
 	}
 
 	return food, nil
+}
 
+func (f *FoodModel) GetFoodTotal(createdAt time.Time) (*models.Food, error) {
+	total := &models.Food{}
+	stm := `SELECT protein, carbohydrate, fat, calories FROM foods WHERE created_at LIKE "%?%" LIMIT 1`
+	row := f.DB.QueryRow(stm, createdAt)
+	err := row.Scan(&total.Protein, &total.Carbohydrates, &total.Fat, &total.Calories)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, models.ErrNoRecord
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return total, nil
 }
 
 func (f *FoodModel) GetFoods(userid int) ([]*models.Food, error) {

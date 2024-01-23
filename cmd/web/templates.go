@@ -24,6 +24,7 @@ type templateData struct {
 	User        *models.User
 	Food        *models.Food
 	Foods       []*models.Food
+	Total       *models.Food
 	CurrentYear int
 }
 
