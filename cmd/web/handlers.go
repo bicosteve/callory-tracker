@@ -28,69 +28,33 @@ func (app *application) getHome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &templateData{Foods: foods}
-
-	nav, err := helpers.LoadTemplate("./ui/html/nav.partial.html")
-	if err != nil {
-		// return error if partial not found
-		app.errorLog.Printf(err.Error())
-		return
-	}
-
-	base, err := helpers.LoadTemplate("./ui/html/layout.base.html")
-	if err != nil {
-		app.serverError(w, err)
-		return
-
-	}
-
-	home, err := helpers.LoadTemplate("./ui/html/home.page.html")
-	if err != nil {
-		app.serverError(w, err)
-		return
-
-	}
-
-	files = append(files, nav)
-	files = append(files, base)
-	files = append(files, home)
-
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	// adding data foods on the template
-	err = ts.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err) // serverError() helper
-		return
-	}
+	app.renderATemplate(w, r, "home.page.html", &templateData{Foods: foods})
 
 }
 
 func (app *application) getFoodPage(w http.ResponseWriter, r *http.Request) {
-	nav, _ := helpers.LoadTemplate("./ui/html/nav.partial.html")
-	base, _ := helpers.LoadTemplate("./ui/html/layout.base.html")
-	add, _ := helpers.LoadTemplate("./ui/html/add_food.page.html")
+	//nav, _ := helpers.LoadTemplate("./ui/html/nav.partial.html")
+	//base, _ := helpers.LoadTemplate("./ui/html/layout.base.html")
+	//add, _ := helpers.LoadTemplate("./ui/html/add_food.page.html")
+	//
+	//files = append(files, nav)
+	//files = append(files, base)
+	//files = append(files, add)
+	//
+	//ts, err := template.ParseFiles(files...)
+	//if err != nil {
+	//	app.serverError(w, err)
+	//	return
+	//}
+	//
+	//err = ts.ExecuteTemplate(w, "base", nil)
+	//if err != nil {
+	//	app.serverError(w, err)
+	//	return
+	//
+	//}
 
-	files = append(files, nav)
-	files = append(files, base)
-	files = append(files, add)
-
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	err = ts.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		app.serverError(w, err)
-		return
-
-	}
+	app.renderATemplate(w, r, "add_food.page.html", nil)
 
 }
 
@@ -101,11 +65,11 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	meal := "lunch"
-	name := "pizza"
-	protein := 5
-	carbohydrates := 20
-	fat := 10
+	meal := "supper"
+	name := "Fish/Ugali"
+	protein := 15
+	carbohydrates := 10
+	fat := 25
 	calories := (protein * cal) + (carbohydrates * cal) + (fat * cal)
 	userId := 1
 

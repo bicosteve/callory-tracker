@@ -69,7 +69,7 @@ func (f *FoodModel) GetFoods(userid int) ([]*models.Food, error) {
 
 	defer rows.Close()
 
-	foods := []*models.Food{}
+	var foods []*models.Food
 
 	for rows.Next() {
 		f := &models.Food{}
