@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"runtime/debug"
@@ -40,10 +41,28 @@ func (app *application) renderATemplate(
 		return
 	}
 
-	// Executes template set, passing in any dynamic data.
-	err := ts.Execute(w, data)
+	/*
+		CATCHING RUNTIME ERRORS WITH A BUFFER.
+		HOW:
+			- when we render template, we make a mock 'trial' of rendering into a buffer.
+			- if there is an error, we will catch it here before we render the template to
+		    http.ResponseWriter.
+			- We will use new(bytes.Buffer)
+			- if there is an error we will catch it here before it gets to ResponseWriter
+	*/
+
+	buffer := new(bytes.Buffer)
+	/*
+		write templates to buffer instead of directly to http.ResponseWriter
+		check for error and returns it if it exists.
+		prevents run time errors to leak to ResponseWriter
+	*/
+	err := ts.Execute(buffer, data)
 	if err != nil {
 		app.serverError(w, err)
+		return
 	}
 
+	// Write the contents of buffer to http.ResponseWriter
+	buffer.WriteTo(w)
 }
