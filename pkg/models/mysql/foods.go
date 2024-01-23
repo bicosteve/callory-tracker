@@ -11,25 +11,29 @@ type FoodModel struct {
 }
 
 // InsertFood(): insert food into db
-func (f *FoodModel) InsertFood(name string, protein int, carbohydrates int, fat int, calories int, userId int) (int, error) {
-	stm := `INSERT INTO foods (name, protein, carbohydrates,fat,calories,created_at,update_at) VALUES (?,?,?,?,?,UTC_TIMESTAMP(),UTC_TIMESTAMP(),?)`
+func (f *FoodModel) InsertFood(meal string, name string, protein int, carbohydrate int, fat int, calories int, userId int) (int, error) {
+	stm := `INSERT INTO foods
+				(meal, name, protein, carbohydrate,fat,calories,created_at,updated_at,userId) 
+			VALUES (?,?,?,?,?,?,NOW(),NOW(),?)`
 
-	result, err := f.DB.Exec(stm, name, protein, carbohydrates, fat, calories, userId)
+	result, err := f.DB.Exec(stm, meal, name,
+		protein, carbohydrate, fat, calories, userId,
+	)
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 
 	id, err := result.LastInsertId()
 	// will return the last inserted id on the table
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 
 	return int(id), nil
 }
 
 func (f *FoodModel) GetFood(foodId, userId int) (*models.Food, error) {
-	stm := `SELECT * FROM foods WHERE id = ? AND userId = ?`
+	stm := `SELECT * FROM foods WHERE id = ? AND userId = ? LIMIT 1`
 	row := f.DB.QueryRow(stm, foodId, userId)
 
 	food := &models.Food{}
@@ -51,7 +55,7 @@ func (f *FoodModel) GetFood(foodId, userId int) (*models.Food, error) {
 }
 
 func (f *FoodModel) GetFoods(userid int) ([]*models.Food, error) {
-	stm := "SELECT * FROM foods WHERE userId = ? ORDER BY created_at DESC"
+	stm := "SELECT * FROM foods WHERE userId = ? ORDER BY created_at DESC LIMIT 100"
 	rows, err := f.DB.Query(stm, userid)
 	if err != nil {
 		return nil, err

@@ -21,8 +21,8 @@ func (u *UserModel) RegisterUser(username, email, password string) error {
 
 	_ = hash
 
-	stm := `INSERT INTO users (name,email,hashed_password,created_at, updated_at)
-			VALUES (?,?,?,UTC_TIMESTAMP(),UTC_TIMESTAMP())`
+	stm := `INSERT INTO users (username,email,hashed_password,created_at, updated_at)
+			VALUES (?,?,?,NOW(),NOW())`
 
 	_, err = u.DB.Exec(stm, strings.Title(username), email, string(hash))
 	if err != nil {
