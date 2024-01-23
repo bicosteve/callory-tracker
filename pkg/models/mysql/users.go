@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"database/sql"
+	"errors"
 	"strings"
 
 	"github.com/bicosteve/callory-tracker/pkg/models"
@@ -44,7 +45,7 @@ func (u *UserModel) LoginUser(email, password string) (int, error) {
 	stm := `SELECT email, hashed_password FROM users WHERE email = ?`
 	row := u.DB.QueryRow(stm, email)
 	err := row.Scan(&id, &hash)
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		return 0, models.ErrorInvalidCredentials
 	}
 
@@ -54,7 +55,7 @@ func (u *UserModel) LoginUser(email, password string) (int, error) {
 
 	// compare provided password and hashed password
 	err = bcrypt.CompareHashAndPassword(hash, []byte(password))
-	if err == bcrypt.ErrMismatchedHashAndPassword {
+	if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 		return 0, models.ErrorInvalidCredentials
 	}
 
@@ -70,7 +71,7 @@ func (u *UserModel) GetUserDetails(id int) (*models.User, error) {
 	user := &models.User{}
 	stm := "SELECT username,email,created_at FROM users WHERE id = ?"
 	err := u.DB.QueryRow(stm, id).Scan(&user.Username, &user.Email, &user.CreatedAt)
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		return nil, models.ErrNoRecord
 	}
 

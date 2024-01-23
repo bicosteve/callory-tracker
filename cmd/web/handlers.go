@@ -1,10 +1,10 @@
 package main
 
 import (
-	"html/template"
+	"errors"
+	"github.com/bicosteve/callory-tracker/pkg/models"
 	"net/http"
-
-	"github.com/bicosteve/callory-tracker/pkg/helpers"
+	"strconv"
 )
 
 var files []string
@@ -17,67 +17,20 @@ func (app *application) getHome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	nav, err := helpers.LoadTemplate("./ui/html/nav.partial.html")
-	if err != nil {
-		// return error if partial not found
-		app.errorLog.Printf(err.Error())
-		return
-	}
+	userID := 1
 
-	base, err := helpers.LoadTemplate("./ui/html/layout.base.html")
-	if err != nil {
-		app.serverError(w, err)
-		return
-
-	}
-
-	home, err := helpers.LoadTemplate("./ui/html/home.page.html")
-	if err != nil {
-		app.serverError(w, err)
-		return
-
-	}
-
-	files = append(files, nav)
-	files = append(files, base)
-	files = append(files, home)
-
-	ts, err := template.ParseFiles(files...)
+	foods, err := app.foods.GetFoods(userID)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	err = ts.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		app.serverError(w, err) // serverError() helper
-		return
-	}
+	app.renderATemplate(w, r, "home.page.html", &templateData{Foods: foods})
 
 }
 
 func (app *application) getFoodPage(w http.ResponseWriter, r *http.Request) {
-	nav, _ := helpers.LoadTemplate("./ui/html/nav.partial.html")
-	base, _ := helpers.LoadTemplate("./ui/html/layout.base.html")
-	add, _ := helpers.LoadTemplate("./ui/html/add_food.page.html")
-
-	files = append(files, nav)
-	files = append(files, base)
-	files = append(files, add)
-
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	err = ts.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		app.serverError(w, err)
-		return
-
-	}
-
+	app.renderATemplate(w, r, "add_food.page.html", nil)
 }
 
 func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
@@ -87,11 +40,11 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	meal := "lunch"
-	name := "pizza"
-	protein := 5
-	carbohydrates := 20
-	fat := 10
+	meal := "supper"
+	name := "Fish/Ugali"
+	protein := 15
+	carbohydrates := 10
+	fat := 25
 	calories := (protein * cal) + (carbohydrates * cal) + (fat * cal)
 	userId := 1
 
@@ -109,57 +62,47 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
-	nav, _ := helpers.LoadTemplate("./ui/html/nav.partial.html")
-	base, _ := helpers.LoadTemplate("./ui/html/layout.base.html")
-	day, _ := helpers.LoadTemplate("./ui/html/day.page.html")
+	foodID, err := strconv.Atoi(r.URL.Query().Get("foodId"))
+	userID, err := strconv.Atoi(r.URL.Query().Get("userId"))
 
-	files = append(files, nav)
-	files = append(files, base)
-	files = append(files, day)
+	if err != nil || foodID < 1 {
+		app.notFound(w)
+		return
+	}
 
-	ts, err := template.ParseFiles(files...)
+	if err != nil || userID < 1 {
+		app.notFound(w)
+		return
+	}
+
+	food, err := app.foods.GetFood(foodID, userID)
+	if errors.Is(err, models.ErrNoRecord) {
+		app.notFound(w)
+		return
+	}
+
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	err = ts.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
+	app.renderATemplate(w, r, "day.page.html", &templateData{Food: food})
 
 }
 
+func (app *application) getRegisterPage(w http.ResponseWriter, r *http.Request) {
+	app.renderATemplate(w, r, "register.page.html", nil)
+}
+
 func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
-	nav, _ := helpers.LoadTemplate("./ui/html/nav.partial.html")
-	base, _ := helpers.LoadTemplate("./ui/html/layout.base.html")
-	register, _ := helpers.LoadTemplate("./ui/html/register.page.html")
-
-	files = append(files, nav)
-	files = append(files, base)
-	files = append(files, register)
-
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
 	username := "Bix"
 	email := "bix@bix.com"
 	password := "12345"
 
-	err = app.users.RegisterUser(username, email, password)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
+	err := app.users.RegisterUser(username, email, password)
 
-	err = ts.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
+	_ = err
+
+	app.renderATemplate(w, r, "register.page.html", nil)
 
 }

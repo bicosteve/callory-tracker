@@ -6,32 +6,43 @@
             <div>
                 <div class="page-header"></div>
 
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">January 28, 2017</h3>
-                    </div>
-                    <div class="panel-body">
-                        <ul class="nav nav-pills" role="tablist">
-                            <li>
-                                <a>Protein: <span class="badge">100</span></a>
-                            </li>
-                            <li>
-                                <a>Carbohydates: <span class="badge">200</span></a>
-                            </li>
-                            <li>
-                                <a>Fat: <span class="badge">50</span></a>
-                            </li>
-                            <li>
-                                <a>Calories: <span class="badge">1650</span></a>
-                            </li>
-                            <li>
-                                <a href="/food/day" type="button" class="btn btn-link"
-                                >View Detail</a
-                                >
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                {{if .Foods }}
+                    {{ range .Foods }}
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">{{neatDate .CreatedAt}}</h3>
+                            </div>
+                            <div class="panel-body">
+                                <ul class="nav nav-pills" role="tablist">
+                                    <li>
+                                        <a>Meal: <span class="badge">{{ .Meal}}</span></a>
+                                    </li>
+                                    <li>
+                                        <a>Protein: <span class="badge">{{ .Protein}}</span></a>
+                                    </li>
+                                    <li>
+                                        <a>Carbs: <span class="badge">{{ .Carbohydrates}}</span></a>
+                                    </li>
+                                    <li>
+                                        <a>Fat: <span class="badge">{{ .Fat}}</span></a>
+                                    </li>
+                                    <li>
+                                        <a>Calories: <span class="badge">{{ .Calories}}</span></a>
+                                    </li>
+                                    <li>
+                                        <a href="/food/day?foodId={{ .ID}}&userId={{.UserID}}" type="button" class="btn btn-link"
+                                        >View Details</a
+                                        >
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    {{end}}
+                {{else}}
+                    <p>You have no foods</p>
+                {{end}}
+
+
             </div>
         </div>
     </div>

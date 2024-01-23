@@ -16,18 +16,16 @@ import (
 type application struct {
 	errorLog      *log.Logger
 	infoLog       *log.Logger
-	templateCache map[string]*template.Template
 	foods         *mysql.FoodModel
 	users         *mysql.UserModel
+	templateCache map[string]*template.Template
 }
 
 func main() {
-	/*
-		Creating logger for logging info messages
-		Creating logger for logging error messages
-	*/
-
+	// infoLog: logging info messages
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+
+	// errorLog: logging info messages
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
 	// Loading env file
@@ -52,7 +50,8 @@ func main() {
 	dbPassword := os.Getenv("DBPASSWORD")
 	dbPort := os.Getenv("DBPORT")
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", dbUser, dbPassword, dbHost, dbPort, dbName)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+		dbUser, dbPassword, dbHost, dbPort, dbName)
 
 	db, err := db.OpenDB(dsn)
 	if err != nil {
@@ -62,13 +61,13 @@ func main() {
 	defer db.Close()
 	// closes the db connection pool before main func exits
 
-	htmlDir, err := helpers.LoadTemplates("./ui/html")
-	if err != nil {
-		errorLog.Fatal(err.Error())
-		return
-	}
-
-	templatesCache, err := loadTemplateCache(htmlDir)
+	templateCache, err := newTemplateCache("./ui/html")
+	/*
+		NB:
+		Having templateCache in the application struct means;
+		1. We have an in memory cache of the relevant template.
+		2. Handlers have access to this cache via the application struct
+	*/
 	if err != nil {
 		errorLog.Fatal(err.Error())
 		return
@@ -77,9 +76,9 @@ func main() {
 	app := &application{
 		errorLog:      errorLog,
 		infoLog:       infoLog,
-		templateCache: templatesCache,
 		foods:         &mysql.FoodModel{DB: db},
 		users:         &mysql.UserModel{DB: db},
+		templateCache: templateCache,
 	}
 
 	serve := &http.Server{
