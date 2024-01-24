@@ -2,12 +2,11 @@ package main
 
 import (
 	"errors"
-	"github.com/bicosteve/callory-tracker/pkg/models"
 	"net/http"
 	"strconv"
-)
 
-var files []string
+	"github.com/bicosteve/callory-tracker/pkg/models"
+)
 
 const cal = 4
 

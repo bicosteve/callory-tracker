@@ -18,5 +18,5 @@ func (app *application) routes() http.Handler {
 	router.Get("/user/register", app.getRegisterPage)
 	router.Post("/user/register", app.registerUser)
 
-	return router
+	return secureHeaders(router)
 }
