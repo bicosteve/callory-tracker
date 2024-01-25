@@ -29,6 +29,7 @@ func (app *application) getHome(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// postFoodForm -> renders the add food form
 func (app *application) postFoodForm(w http.ResponseWriter, r *http.Request) {
 	app.renderATemplate(w, r, "add_food.page.html", nil)
 }
@@ -40,15 +41,23 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	meal := "supper"
-	name := "Fish/Ugali"
-	protein := 15
-	carbohydrates := 10
-	fat := 25
-	calories := (protein * cal) + (carbohydrates * cal) + (fat * cal)
+	// using r.ParseFor() method to parse the form
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	meal := r.PostForm.Get("meal")
+	name := r.PostForm.Get("name")
+	protein, _ := strconv.Atoi(r.PostForm.Get("protein"))
+	carbs, _ := strconv.Atoi(r.PostForm.Get("carbohydrate"))
+	fat, _ := strconv.Atoi(r.PostForm.Get("fat"))
+
+	calories := (protein * cal) + (carbs * cal) + (fat * cal)
 	userId := 1
 
-	id, err := app.foods.InsertFood(meal, name, protein, carbohydrates, fat, calories, userId)
+	id, err := app.foods.InsertFood(meal, name, protein, carbs, fat, calories, userId)
 
 	if err != nil {
 		app.serverError(w, err)
@@ -57,7 +66,6 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, fmt.Sprintf("/food/day?foodId=%d&userId=%d", id, userId), http.StatusSeeOther)
-
 }
 
 func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
