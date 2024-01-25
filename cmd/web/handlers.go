@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/bicosteve/callory-tracker/pkg/helpers"
 	"net/http"
 	"strconv"
 
@@ -41,18 +42,43 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// using r.ParseFor() method to parse the form
+	// using r.ParseForm() method to parse the form
 	err := r.ParseForm()
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
+	/*
+		r.PostForm() works only for POST, PATCH, PUT.
+		Can also use r.Form() for all http requests. Used for query strings
+		/food/add?foo=bar
+		r.Form.Get("foo")
+
+	*/
 	meal := r.PostForm.Get("meal")
 	name := r.PostForm.Get("name")
+
 	protein, _ := strconv.Atoi(r.PostForm.Get("protein"))
+	isValid := helpers.CheckFormInput(protein)
+	if !isValid {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
 	carbs, _ := strconv.Atoi(r.PostForm.Get("carbohydrate"))
+	isValid = helpers.CheckFormInput(carbs)
+	if !isValid {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
 	fat, _ := strconv.Atoi(r.PostForm.Get("fat"))
+	isValid = helpers.CheckFormInput(fat)
+	if !isValid {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
 
 	calories := (protein * cal) + (carbs * cal) + (fat * cal)
 	userId := 1
