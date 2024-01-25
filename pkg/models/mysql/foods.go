@@ -62,7 +62,8 @@ func (f *FoodModel) GetFood(foodId, userId int) (*models.Food, error) {
 
 func (f *FoodModel) GetFoodTotal(createdAt time.Time) (*models.Food, error) {
 	total := &models.Food{}
-	stm := `SELECT protein, carbohydrate, fat, calories FROM foods WHERE created_at LIKE "%?%" LIMIT 1`
+	stm := `SELECT SUM(protein), SUM(carbohydrate), SUM(fat), SUM(calories) 
+			FROM foods WHERE created_at LIKE "%?%" LIMIT 1`
 	row := f.DB.QueryRow(stm, createdAt)
 	err := row.Scan(&total.Protein, &total.Carbohydrates, &total.Fat, &total.Calories)
 

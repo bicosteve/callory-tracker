@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/justinas/alice"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -8,15 +9,19 @@ import (
 
 func (app *application) routes() http.Handler {
 	router := chi.NewRouter()
+
+	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
+
 	// Routes
 	router.Get("/", app.getHome)
-	router.Get("/food/add", app.getFoodPage)
-	router.Get("/food/day", app.getDay)
+	router.Get("/food/add", app.postFoodForm)
 	router.Post("/food/add", app.postFood)
+
+	router.Get("/food/day", app.getDay)
 
 	// User register
 	router.Get("/user/register", app.getRegisterPage)
 	router.Post("/user/register", app.registerUser)
 
-	return router
+	return standardMiddleware.Then(router)
 }

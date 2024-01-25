@@ -1,15 +1,24 @@
 package helpers
 
-import "path/filepath"
+import (
+	"fmt"
+	"net/http"
+	"path/filepath"
+	"runtime/debug"
 
-func LoadTemplate(template string) (string, error) {
-	temp, err := filepath.Abs(template)
-	if err != nil {
-		return "", err
-	}
+	"github.com/bicosteve/callory-tracker/pkg/configs"
+)
 
-	return temp, nil
-}
+type Application configs.Application
+
+//func LoadTemplate(template string) (string, error) {
+//	temp, err := filepath.Abs(template)
+//	if err != nil {
+//		return "", err
+//	}
+//
+//	return temp, nil
+//}
 
 func LoadEnv(name string) (string, error) {
 	file, err := filepath.Abs(name)
@@ -20,11 +29,8 @@ func LoadEnv(name string) (string, error) {
 	return file, nil
 }
 
-//func LoadTemplates(dir string) (string, error) {
-//	path, err := filepath.Abs(dir)
-//	if err != nil {
-//		return "", err
-//	}
-//
-//	return path, nil
-//}
+func (app *Application) ServerError(w http.ResponseWriter, err error) {
+	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
+	app.ErrorLog.Output(2, trace) // returns which line error is.
+	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+}
