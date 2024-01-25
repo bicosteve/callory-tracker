@@ -14,9 +14,10 @@ func (app *application) routes() http.Handler {
 
 	// Routes
 	router.Get("/", app.getHome)
-	router.Get("/food/add", app.getFoodPage)
-	router.Get("/food/day", app.getDay)
+	router.Get("/food/add", app.postFoodForm)
 	router.Post("/food/add", app.postFood)
+
+	router.Get("/food/day", app.getDay)
 
 	// User register
 	router.Get("/user/register", app.getRegisterPage)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -28,7 +29,7 @@ func (app *application) getHome(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (app *application) getFoodPage(w http.ResponseWriter, r *http.Request) {
+func (app *application) postFoodForm(w http.ResponseWriter, r *http.Request) {
 	app.renderATemplate(w, r, "add_food.page.html", nil)
 }
 
@@ -55,8 +56,7 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte("Post foods"))
-	app.infoLog.Println(id)
+	http.Redirect(w, r, fmt.Sprintf("/food/day?foodId=%d&userId=%d", id, userId), http.StatusSeeOther)
 
 }
 
