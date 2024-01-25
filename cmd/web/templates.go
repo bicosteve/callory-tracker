@@ -17,6 +17,7 @@ of custom template functions
 */
 var functions = template.FuncMap{
 	"neatDate": neatDate,
+	"foodDate": foodDate,
 }
 
 // templateData struct will hold any dynamic data that we want to pass to HTM Templates
@@ -81,5 +82,11 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 
 // neatDate -> formats the date to neat readable date
 func neatDate(t time.Time) string {
+
 	return t.Format("Jan 02, 2006")
+}
+
+// foodDate -> returns formatted date for totaling food
+func foodDate(t time.Time) string {
+	return t.Format("2006-01-02")
 }

@@ -10,6 +10,18 @@
                     </div>
 
                     <div class="panel-body">
+
+                        <form method="POST" action="/">
+                            <div class="form-group">
+                                <select name="day" class="form-control">
+                                    <option>{{foodDate .Food.CreatedAt}}</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                Calculate
+                            </button>
+                        </form>
+
                         <div class="page-header"></div>
 
                         <ul class="nav nav-pills" role="tablist">
