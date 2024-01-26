@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/bicosteve/callory-tracker/pkg/models"
 	"html/template"
+	"net/url"
 	"path/filepath"
 	"time"
 )
@@ -27,6 +28,8 @@ type templateData struct {
 	Foods       []*models.Food
 	Total       *models.Food
 	CurrentYear int
+	FormData    url.Values        /*repopulating the form with submitted data*/
+	FormErrors  map[string]string // holding form input error messages
 }
 
 // Used for template caching when the application starts

@@ -6,6 +6,8 @@ import (
 	"github.com/bicosteve/callory-tracker/pkg/helpers"
 	"net/http"
 	"strconv"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/bicosteve/callory-tracker/pkg/models"
 )
@@ -56,27 +58,53 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 		r.Form.Get("foo")
 
 	*/
+
+	// Errors map
+	errors := make(map[string]string)
+
 	meal := r.PostForm.Get("meal")
 	name := r.PostForm.Get("name")
-
 	protein, _ := strconv.Atoi(r.PostForm.Get("protein"))
+	carbs, _ := strconv.Atoi(r.PostForm.Get("carbohydrate"))
+	fat, _ := strconv.Atoi(r.PostForm.Get("fat"))
+
+	if strings.TrimSpace(meal) == "" {
+		errors["meal"] = "This field is required"
+	} else if utf8.RuneCountInString(meal) > 10 {
+		errors["meal"] = "Field is too long (max 10)"
+	}
+
+	if strings.TrimSpace(name) == "" {
+		errors["name"] = "This field is required"
+	} else if utf8.RuneCountInString(name) > 20 {
+		errors["name"] = "Field is too long (max 20)"
+	}
+
 	isValid := helpers.CheckFormInput(protein)
 	if !isValid {
-		app.clientError(w, http.StatusBadRequest)
-		return
+		errors["protein"] = "Value cannot be less than 1"
 	}
 
-	carbs, _ := strconv.Atoi(r.PostForm.Get("carbohydrate"))
 	isValid = helpers.CheckFormInput(carbs)
 	if !isValid {
-		app.clientError(w, http.StatusBadRequest)
-		return
+		if !isValid {
+			errors["carbohydrates"] = "Value cannot be less than 1"
+		}
 	}
 
-	fat, _ := strconv.Atoi(r.PostForm.Get("fat"))
 	isValid = helpers.CheckFormInput(fat)
 	if !isValid {
-		app.clientError(w, http.StatusBadRequest)
+		if !isValid {
+			errors["fat"] = "Value cannot be less than 1"
+		}
+	}
+
+	if len(errors) > 0 {
+		// if error occurs redisplay error add_food page passing the validation error
+		// FormErrors:errors  and also previously submitted data FormData:r.PostForm
+		app.renderATemplate(w, r, "add_food.page.html", &templateData{
+			FormErrors: errors, FormData: r.PostForm,
+		})
 		return
 	}
 
@@ -84,7 +112,6 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 	userId := 1
 
 	id, err := app.foods.InsertFood(meal, name, protein, carbs, fat, calories, userId)
-
 	if err != nil {
 		app.serverError(w, err)
 		app.errorLog.Println(err)

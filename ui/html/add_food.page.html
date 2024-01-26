@@ -11,15 +11,18 @@
 
                     <div class="panel-body">
                         <div class="page-header"></div>
-                        <form  action="/food/add" method="POST">
+                        <form  action="/food/add" method="POST" novalidate>
                             <div class="form-group">
                                 <label for="meal">Meal</label>
-                                <select class="form-control" name="meal" id="meal">
+                                <select  class="form-control" name="meal" id="meal">
                                     <option>Breakfast</option>
                                     <option>Lunch</option>
                                     <option>Supper</option>
                                     <option>Snack</option>
                                 </select>
+                                {{with .FormErrors.meal}}
+                                <small class="text-danger" >{{.}}</small>
+                                {{end}}
                             </div>
                             <div class="form-group">
                                 <label for="food-name">Food Name</label>
@@ -29,7 +32,11 @@
                                         id="food-name"
                                         name="name"
                                         placeholder="Food Name"
+                                        value='{{.FormData.Get "name"}}'
                                 />
+                                {{with .FormErrors.name}}
+                                    <small class="text-danger" >{{.}}</small>
+                                {{end}}
                             </div>
                             <div class="form-group">
                                 <label for="protein">Protein</label>
@@ -39,7 +46,11 @@
                                         id="protein"
                                         name="protein"
                                         placeholder="Protein in (g)"
+                                        value='{{ .FormData.Get "protein"}}'
                                 />
+                                {{with .FormErrors.protein}}
+                                  <small class="text-danger" >{{.}}</small>
+                                {{end}}
                             </div>
                             <div class="form-group">
                                 <label for="carbohydrate">Carbohydrates</label>
@@ -49,7 +60,11 @@
                                         id="carbohydrate"
                                         name="carbohydrate"
                                         placeholder="Carbohydrates in (g)"
+                                        value='{{.FormData.Get "carbohydrate"}}'
                                 />
+                                {{with .FormErrors.carbohydrates}}
+                                    <small class="text-danger" >{{.}}</small>
+                                {{end}}
                             </div>
                             <div class="form-group">
                                 <label for="fat">Fat</label>
@@ -59,7 +74,11 @@
                                         id="fat"
                                         name="fat"
                                         placeholder="Fat in (g)"
+                                        value='{{.FormData.Get "fat"}}'
                                 />
+                                {{with .FormErrors.fat}}
+                                    <small class="text-danger" >{{.}}</small>
+                                {{end}}
                             </div>
                             <button type="submit" class="btn btn-primary">
                                 Add
