@@ -1,8 +1,10 @@
 package main
 
 import (
+	"github.com/bicosteve/callory-tracker/pkg/forms"
 	"github.com/bicosteve/callory-tracker/pkg/models"
 	"html/template"
+	"net/url"
 	"path/filepath"
 	"time"
 )
@@ -17,6 +19,7 @@ of custom template functions
 */
 var functions = template.FuncMap{
 	"neatDate": neatDate,
+	"foodDate": foodDate,
 }
 
 // templateData struct will hold any dynamic data that we want to pass to HTM Templates
@@ -26,6 +29,9 @@ type templateData struct {
 	Foods       []*models.Food
 	Total       *models.Food
 	CurrentYear int
+	FormData    url.Values        /*repopulating the form with submitted data*/
+	FormErrors  map[string]string // holding form input error messages
+	Form        *forms.Form
 }
 
 // Used for template caching when the application starts
@@ -81,5 +87,11 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 
 // neatDate -> formats the date to neat readable date
 func neatDate(t time.Time) string {
+
 	return t.Format("Jan 02, 2006")
+}
+
+// foodDate -> returns formatted date for totaling food
+func foodDate(t time.Time) string {
+	return t.Format("2006-01-02")
 }
