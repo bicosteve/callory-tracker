@@ -3,13 +3,10 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/bicosteve/callory-tracker/pkg/helpers"
+	"github.com/bicosteve/callory-tracker/pkg/forms"
+	"github.com/bicosteve/callory-tracker/pkg/models"
 	"net/http"
 	"strconv"
-	"strings"
-	"unicode/utf8"
-
-	"github.com/bicosteve/callory-tracker/pkg/models"
 )
 
 const cal = 4
@@ -34,7 +31,9 @@ func (app *application) getHome(w http.ResponseWriter, r *http.Request) {
 
 // postFoodForm -> renders the add food form
 func (app *application) postFoodForm(w http.ResponseWriter, r *http.Request) {
-	app.renderATemplate(w, r, "add_food.page.html", nil)
+	// passing new empty forms.Form object to the template
+	app.renderATemplate(w, r, "add_food.page.html",
+		&templateData{Form: forms.NewForm(nil)})
 }
 
 func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
@@ -52,61 +51,28 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 	}
 
 	/*
-		r.PostForm() works only for POST, PATCH, PUT.
+		NB: r.PostForm() works only for POST, PATCH, PUT.
 		Can also use r.Form() for all http requests. Used for query strings
 		/food/add?foo=bar
 		r.Form.Get("foo")
-
 	*/
 
-	// Errors map
-	errors := make(map[string]string)
+	form := forms.NewForm(r.PostForm)
+	form.Required("meal", "name", "protein", "carbohydrate", "fat")
+	form.MaxLength("name", 20)
+	form.MinValue(1, "protein", "carbohydrate", "fat")
 
-	meal := r.PostForm.Get("meal")
-	name := r.PostForm.Get("name")
-	protein, _ := strconv.Atoi(r.PostForm.Get("protein"))
-	carbs, _ := strconv.Atoi(r.PostForm.Get("carbohydrate"))
-	fat, _ := strconv.Atoi(r.PostForm.Get("fat"))
-
-	if strings.TrimSpace(meal) == "" {
-		errors["meal"] = "This field is required"
-	} else if utf8.RuneCountInString(meal) > 10 {
-		errors["meal"] = "Field is too long (max 10)"
-	}
-
-	if strings.TrimSpace(name) == "" {
-		errors["name"] = "This field is required"
-	} else if utf8.RuneCountInString(name) > 20 {
-		errors["name"] = "Field is too long (max 20)"
-	}
-
-	isValid := helpers.CheckFormInput(protein)
-	if !isValid {
-		errors["protein"] = "Value cannot be less than 1"
-	}
-
-	isValid = helpers.CheckFormInput(carbs)
-	if !isValid {
-		if !isValid {
-			errors["carbohydrates"] = "Value cannot be less than 1"
-		}
-	}
-
-	isValid = helpers.CheckFormInput(fat)
-	if !isValid {
-		if !isValid {
-			errors["fat"] = "Value cannot be less than 1"
-		}
-	}
-
-	if len(errors) > 0 {
-		// if error occurs redisplay error add_food page passing the validation error
-		// FormErrors:errors  and also previously submitted data FormData:r.PostForm
-		app.renderATemplate(w, r, "add_food.page.html", &templateData{
-			FormErrors: errors, FormData: r.PostForm,
-		})
+	if !form.Valid() {
+		app.renderATemplate(w, r, "add_food.page.html",
+			&templateData{Form: form})
 		return
 	}
+
+	meal := form.Get("meal")
+	name := form.Get("name")
+	protein, _ := strconv.Atoi(form.Get("protein"))
+	carbs, _ := strconv.Atoi(form.Get("carbohydrate"))
+	fat, _ := strconv.Atoi(form.Get("fat"))
 
 	calories := (protein * cal) + (carbs * cal) + (fat * cal)
 	userId := 1
