@@ -139,6 +139,7 @@ func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
 	form := forms.NewForm(r.PostForm)
 	form.Required("username", "email", "password", "confirm_password")
 	form.MaxLength("username", 10)
+	//form.MinLength("password", 5)
 	form.ValidateEmail("email", forms.EmailRegex)
 	form.ComparePasswords("password", "confirm_password")
 
@@ -160,7 +161,7 @@ func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
 
 	app.session.Put(r, "flash", "Registered successfully")
 
-	http.Redirect(w, r, "login.page.html", http.StatusSeeOther)
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
 
 func (app *application) getLoginPage(w http.ResponseWriter, r *http.Request) {
@@ -192,14 +193,21 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 	password := form.Get("password")
 
 	userId, err := app.users.LoginUser(email, password)
+	if err == models.ErrorInvalidCredentials {
+		form.Errors.Add("generic", "Email or password is incorrect")
+		app.renderATemplate(w, r, "login.page.html", &templateData{Form: form})
+		return
+	}
+
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
+	app.session.Put(r, "flash", "Successfully logged in")
 	app.session.Put(r, "userId", userId)
 
-	http.Redirect(w, r, "home.page.html", http.StatusSeeOther)
+	http.Redirect(w, r, "/food/add", http.StatusSeeOther)
 }
 
 func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {

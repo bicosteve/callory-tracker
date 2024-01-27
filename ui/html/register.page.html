@@ -12,13 +12,14 @@
                     <div class="panel-body">
                         <div class="page-header"></div>
                         <form method="POST" action="/user/register" novalidate>
-                            {{with .Form }}
+                            {{with .Form}}
                                 <div class="form-group">
                                     <label for="username">Username</label>
                                     <input
                                             type="text"
                                             class="form-control"
                                             id="username"
+                                            name="username"
                                             placeholder="Username"
                                             value='{{.Get "username"}}'
                                     />
@@ -32,6 +33,7 @@
                                             type="text"
                                             class="form-control"
                                             id="email"
+                                            name="email"
                                             placeholder="example@example.com"
                                             value='{{.Get "email"}}'
                                     />
@@ -45,6 +47,7 @@
                                             type="password"
                                             class="form-control"
                                             id="password"
+                                            name="password"
                                             placeholder="*****"
                                     />
                                     {{with .Errors.Get "password" }}
@@ -57,10 +60,11 @@
                                             type="password"
                                             class="form-control"
                                             id="confirm_password"
+                                            name="confirm_password"
                                             placeholder="*****"
                                     />
-                                    {{with .Errors.Get "confirmPassword" }}
-                                    <small class="text-danger">{{.}}</small>
+                                    {{with .Errors.Get "confirm_password" }}
+                                         <small class="text-danger">{{.}}</small>
                                     {{end}}
                                 </div>
                                 <button type="submit" class="btn btn-primary">

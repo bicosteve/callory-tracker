@@ -13,6 +13,9 @@
                         <div class="page-header"></div>
                         <form method="POST" action="/user/login" novalidate>
                             {{with .Form }}
+                                {{with .Errors.Get "generic" }}
+                                    <div class="text-danger alert-danger my-2" role="alert">{{.}}</div>
+                                {{end}}
                                 <div class="form-group">
                                     <label for="email">Email</label>
                                     <input
@@ -20,11 +23,9 @@
                                             class="form-control"
                                             id="email"
                                             placeholder="example@example.com"
+                                            name="email"
                                             value='{{.Get "email"}}'
                                     />
-                                    {{with .Errors.Get "email" }}
-                                    <small class="text-danger">{{.}}</small>
-                                    {{end}}
                                 </div>
                                 <div class="form-group">
                                     <label for="password">Password</label>
@@ -32,11 +33,9 @@
                                             type="password"
                                             class="form-control"
                                             id="password"
+                                            name="password"
                                             placeholder="*****"
                                     />
-                                    {{with .Errors.Get "password" }}
-                                    <small class="text-danger">{{.}}</small>
-                                    {{end}}
                                 </div>
                                 <button type="submit" class="btn btn-primary">
                                     Login
