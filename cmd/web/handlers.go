@@ -139,7 +139,7 @@ func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
 	form := forms.NewForm(r.PostForm)
 	form.Required("username", "email", "password", "confirm_password")
 	form.MaxLength("username", 10)
-	form.ValidateEmail("email")
+	form.ValidateEmail("email", forms.EmailRegex)
 	form.ComparePasswords("password", "confirm_password")
 
 	if !form.Valid() {
@@ -182,7 +182,6 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 
 	form := forms.NewForm(r.PostForm)
 	form.Required("email", "password")
-	form.ValidateEmail("email")
 
 	if !form.Valid() {
 		app.renderATemplate(w, r, "login.page.html", &templateData{Form: form})

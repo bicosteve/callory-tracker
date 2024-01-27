@@ -3,6 +3,7 @@ package forms
 import (
 	"fmt"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -11,6 +12,8 @@ import (
 // Custom Form struct which anonymously embeds  url.Values object
 // which holds the form data and an Errors field that hold validation
 // errors for form data.
+
+var EmailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
 type Form struct {
 	url.Values
@@ -99,15 +102,16 @@ func (f *Form) ComparePasswords(password, confirmPassword string) {
 
 }
 
-func (f *Form) ValidateEmail(field string) {
+func (f *Form) ValidateEmail(field string, pattern *regexp.Regexp) {
 	value := f.Get(field)
 
 	if value == "" {
 		return
 	}
 
-	f.Errors.Add(field, "Invalid email address")
-
+	if !pattern.MatchString(value) {
+		f.Errors.Add(field, "Invalid email address")
+	}
 }
 
 // Valid check if the form is valid

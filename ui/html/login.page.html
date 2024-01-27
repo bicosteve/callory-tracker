@@ -12,27 +12,36 @@
                     <div class="panel-body">
                         <div class="page-header"></div>
                         <form method="POST" action="/user/login" novalidate>
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input
-                                        type="text"
-                                        class="form-control"
-                                        id="email"
-                                        placeholder="example@example.com"
-                                />
-                            </div>
-                            <div class="form-group">
-                                <label for="password">Password</label>
-                                <input
-                                        type="password"
-                                        class="form-control"
-                                        id="password"
-                                        placeholder="*****"
-                                />
-                            </div>
-                            <button type="submit" class="btn btn-primary">
-                                Login
-                            </button>
+                            {{with .Form }}
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input
+                                            type="text"
+                                            class="form-control"
+                                            id="email"
+                                            placeholder="example@example.com"
+                                            value='{{.Get "email"}}'
+                                    />
+                                    {{with .Errors.Get "email" }}
+                                    <small class="text-danger">{{.}}</small>
+                                    {{end}}
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Password</label>
+                                    <input
+                                            type="password"
+                                            class="form-control"
+                                            id="password"
+                                            placeholder="*****"
+                                    />
+                                    {{with .Errors.Get "password" }}
+                                    <small class="text-danger">{{.}}</small>
+                                    {{end}}
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    Login
+                                </button>
+                            {{end}}
                         </form>
                     </div>
                 </div>
