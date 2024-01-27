@@ -92,9 +92,12 @@ func main() {
 	}
 
 	serve := &http.Server{
-		Addr:     port,
-		Handler:  session.Enable(app.routes()), // wraps handlers with session
-		ErrorLog: errorLog,
+		Addr:         port,
+		Handler:      session.Enable(app.routes()), // wraps handlers with session
+		ErrorLog:     errorLog,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	infoLog.Printf("Server running at %s ... \n", port)
