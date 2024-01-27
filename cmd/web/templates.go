@@ -32,6 +32,7 @@ type templateData struct {
 	FormData    url.Values        /*repopulating the form with submitted data*/
 	FormErrors  map[string]string // holding form input error messages
 	Form        *forms.Form
+	Flash       string
 }
 
 // Used for template caching when the application starts

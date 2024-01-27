@@ -47,7 +47,22 @@
         </style>
     </head>
         <body>
-            {{template "nav" .}}
+            {{template "nav" .}} <!--Navbar--->
+
+            <!---Flash message--->
+            {{with .Flash}}
+                <div class="container">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="row">
+                            <div class="alert alert-success my-1" role="alert">
+                                {{.}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{end}}
+
+            <!---Body Content--->
             {{block "content" .}}
 
             {{end}}
