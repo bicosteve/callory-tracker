@@ -21,7 +21,11 @@ func (app *application) routes() http.Handler {
 
 	// User register
 	router.Get("/user/register", app.getRegisterPage)
+	router.Get("/user/login", app.getLoginPage)
+
 	router.Post("/user/register", app.registerUser)
+	router.Post("/user/login", app.loginUser)
+	router.Post("/user/logout", app.logoutUser)
 
 	return standardMiddleware.Then(router)
 }

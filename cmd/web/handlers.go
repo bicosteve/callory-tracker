@@ -120,7 +120,8 @@ func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) getRegisterPage(w http.ResponseWriter, r *http.Request) {
-	app.renderATemplate(w, r, "register.page.html", nil)
+	app.renderATemplate(w, r, "register.page.html",
+		&templateData{Form: forms.NewForm(nil)})
 }
 
 func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
@@ -133,5 +134,17 @@ func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
 	_ = err
 
 	app.renderATemplate(w, r, "register.page.html", nil)
+}
 
+func (app *application) getLoginPage(w http.ResponseWriter, r *http.Request) {
+	app.renderATemplate(w, r, "login.page.html",
+		&templateData{Form: forms.NewForm(nil)})
+}
+
+func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("This is get loggin page")
+}
+
+func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("This is logout page")
 }

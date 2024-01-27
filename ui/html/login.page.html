@@ -6,21 +6,12 @@
             <div>
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Register</h3>
+                        <h3 class="panel-title">Login</h3>
                     </div>
 
                     <div class="panel-body">
                         <div class="page-header"></div>
-                        <form method="POST" action="/user/register" novalidate>
-                            <div class="form-group">
-                                <label for="username">Username</label>
-                                <input
-                                        type="text"
-                                        class="form-control"
-                                        id="username"
-                                        placeholder="Username"
-                                />
-                            </div>
+                        <form method="POST" action="/user/login" novalidate>
                             <div class="form-group">
                                 <label for="email">Email</label>
                                 <input
@@ -39,17 +30,8 @@
                                         placeholder="*****"
                                 />
                             </div>
-                            <div class="form-group">
-                                <label for="confirm_password">Confirm Password</label>
-                                <input
-                                        type="password"
-                                        class="form-control"
-                                        id="confirm_password"
-                                        placeholder="*****"
-                                />
-                            </div>
                             <button type="submit" class="btn btn-primary">
-                                Register
+                                Login
                             </button>
                         </form>
                     </div>
