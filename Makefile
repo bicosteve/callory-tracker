@@ -3,7 +3,7 @@ hello:
 
 
 run:
-	nodemon --exec go run ./cmd/web/*.go --signal SIGTERM 
+	nodemon --exec go run ./cmd/web/*.go --signal SIGTERM
 
 
 test: 
