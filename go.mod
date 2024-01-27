@@ -10,4 +10,8 @@ require (
 	golang.org/x/crypto v0.18.0
 )
 
-require github.com/justinas/alice v1.2.0 // indirect
+require (
+	github.com/golangcollege/sessions v1.2.0 // indirect
+	github.com/justinas/alice v1.2.0 // indirect
+	golang.org/x/sys v0.16.0 // indirect
+)
