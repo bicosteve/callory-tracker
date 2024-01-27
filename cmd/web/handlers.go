@@ -84,6 +84,9 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// app.session.Put: adding flash message when meal is created
+	app.session.Put(r, "flash", "Meal successfully added!")
+
 	http.Redirect(w, r, fmt.Sprintf("/food/day?foodId=%d&userId=%d", id, userId), http.StatusSeeOther)
 }
 
@@ -112,8 +115,8 @@ func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.renderATemplate(w, r, "day.page.html", &templateData{Food: food})
-
+	app.renderATemplate(w, r, "day.page.html", &templateData{
+		Food: food})
 }
 
 func (app *application) getRegisterPage(w http.ResponseWriter, r *http.Request) {

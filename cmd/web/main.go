@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"github.com/golangcollege/sessions"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/bicosteve/callory-tracker/pkg/db"
 	"github.com/bicosteve/callory-tracker/pkg/helpers"
@@ -19,6 +21,7 @@ type application struct {
 	foods         *mysql.FoodModel
 	users         *mysql.UserModel
 	templateCache map[string]*template.Template
+	session       *sessions.Session
 }
 
 func main() {
@@ -49,6 +52,7 @@ func main() {
 	dbHost := os.Getenv("DBHOST")
 	dbPassword := os.Getenv("DBPASSWORD")
 	dbPort := os.Getenv("DBPORT")
+	secret := os.Getenv("SESSION")
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
 		dbUser, dbPassword, dbHost, dbPort, dbName)
@@ -73,17 +77,23 @@ func main() {
 		return
 	}
 
+	session := sessions.New([]byte(secret))
+	session.Lifetime = 12 * time.Hour
+	session.Secure = true
+	session.SameSite = http.SameSiteStrictMode
+
 	app := &application{
 		errorLog:      errorLog,
 		infoLog:       infoLog,
 		foods:         &mysql.FoodModel{DB: db},
 		users:         &mysql.UserModel{DB: db},
 		templateCache: templateCache,
+		session:       session,
 	}
 
 	serve := &http.Server{
 		Addr:     port,
-		Handler:  app.routes(),
+		Handler:  session.Enable(app.routes()), // wraps handlers with session
 		ErrorLog: errorLog,
 	}
 
