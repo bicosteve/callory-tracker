@@ -82,6 +82,27 @@ func (f *Form) AllowedValues(field string, options ...string) {
 	f.Errors.Add(field, "This field is invalid")
 }
 
+func (f *Form) ComparePasswords(password, confirmPassword string) {
+	valueOne := f.Get(password)
+	if valueOne == "" {
+		return
+	}
+
+	valueTwo := f.Get(confirmPassword)
+	if valueTwo == "" {
+		return
+	}
+
+	if valueOne != valueTwo {
+		f.Errors.Add(confirmPassword, "Confirm password does not match password")
+	}
+
+}
+
+func (f *Form) ValidateEmail(email string) error {
+	return nil
+}
+
 // Valid check if the form is valid
 func (f *Form) Valid() bool {
 	return len(f.Errors) == 0

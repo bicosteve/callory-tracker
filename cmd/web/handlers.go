@@ -37,7 +37,7 @@ func (app *application) postFoodForm(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
+	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", "POST")
 		app.clientError(w, http.StatusMethodNotAllowed)
 		return
@@ -125,15 +125,42 @@ func (app *application) getRegisterPage(w http.ResponseWriter, r *http.Request) 
 }
 
 func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
-	username := "Bix"
-	email := "bix@bix.com"
-	password := "12345"
+	if r.Method != http.MethodPost {
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
 
-	err := app.users.RegisterUser(username, email, password)
+	err := r.ParseForm()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
 
-	_ = err
+	form := forms.NewForm(r.PostForm)
+	form.Required("username", "email", "password", "confirm_password")
+	form.MaxLength("username", 10)
+	form.ValidateEmail("email")
+	form.ComparePasswords("password", "confirm_password")
 
-	app.renderATemplate(w, r, "register.page.html", nil)
+	if !form.Valid() {
+		app.renderATemplate(w, r, "register.page.html", &templateData{Form: form})
+		return
+	}
+
+	username := form.Get("username")
+	email := form.Get("email")
+	password := form.Get("password")
+
+	err = app.users.RegisterUser(username, email, password)
+	if err != nil {
+		app.serverError(w, err)
+		app.errorLog.Println(err)
+		return
+	}
+
+	app.session.Put(r, "flash", "Registered successfully")
+
+	http.Redirect(w, r, "login.page.html", http.StatusSeeOther)
 }
 
 func (app *application) getLoginPage(w http.ResponseWriter, r *http.Request) {
@@ -142,7 +169,38 @@ func (app *application) getLoginPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("This is get loggin page")
+	if r.Method != http.MethodPost {
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	form := forms.NewForm(r.PostForm)
+	form.Required("email", "password")
+	form.ValidateEmail("email")
+
+	if !form.Valid() {
+		app.renderATemplate(w, r, "login.page.html", &templateData{Form: form})
+		return
+	}
+
+	email := form.Get("email")
+	password := form.Get("password")
+
+	userId, err := app.users.LoginUser(email, password)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	app.session.Put(r, "userId", userId)
+
+	http.Redirect(w, r, "home.page.html", http.StatusSeeOther)
 }
 
 func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
