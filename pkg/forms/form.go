@@ -99,8 +99,15 @@ func (f *Form) ComparePasswords(password, confirmPassword string) {
 
 }
 
-func (f *Form) ValidateEmail(email string) error {
-	return nil
+func (f *Form) ValidateEmail(field string) {
+	value := f.Get(field)
+
+	if value == "" {
+		return
+	}
+
+	f.Errors.Add(field, "Invalid email address")
+
 }
 
 // Valid check if the form is valid

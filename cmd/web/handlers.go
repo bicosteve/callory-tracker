@@ -75,7 +75,7 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 	fat, _ := strconv.Atoi(form.Get("fat"))
 
 	calories := (protein * cal) + (carbs * cal) + (fat * cal)
-	userId := 1
+	userId := app.session.GetInt(r, "userId")
 
 	id, err := app.foods.InsertFood(meal, name, protein, carbs, fat, calories, userId)
 	if err != nil {
