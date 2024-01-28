@@ -31,6 +31,7 @@ type templateData struct {
 	Form              *forms.Form
 	Flash             string
 	AuthenticatedUser int
+	CSRFToken         string
 }
 
 // Used for template caching when the application starts

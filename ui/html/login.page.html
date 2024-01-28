@@ -11,11 +11,13 @@
 
                     <div class="panel-body">
                         <div class="page-header"></div>
-                        {{with .Form }}
-                        {{with .Errors.Get "generic" }}
-                            <div class="text-danger my-2" role="alert">{{.}}</div>
-                        {{end}}
+
                         <form method="POST" action="/user/login" novalidate>
+                            <input type="hidden" name="csrf_token" value='{{.CSRFToken}}'>
+                            {{with .Form }}
+                                {{with .Errors.Get "generic" }}
+                                    <div class="text-danger my-2" role="alert">{{.}}</div>
+                                {{end}}
                                 <div class="form-group">
                                     <label for="email">Email</label>
                                     <input

@@ -10,7 +10,7 @@ import (
 func (app *application) routes() http.Handler {
 	router := chi.NewRouter()
 
-	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
+	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, secureHeaders, noSurf)
 
 	// Only authenticated users can access these routes
 	router.Group(func(r chi.Router) {

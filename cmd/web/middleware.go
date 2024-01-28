@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/justinas/nosurf"
 	"net/http"
 )
 
@@ -40,6 +41,7 @@ func (app *application) logRequest(next http.Handler) http.Handler {
 	})
 }
 
+// requireAuthenticatedUser middleware to stop unauthenticated users from accessing some urls
 func (app *application) requireAuthenticatedUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// if user not authenticated, redirect to login page
@@ -50,4 +52,17 @@ func (app *application) requireAuthenticatedUser(next http.Handler) http.Handler
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+// noSurf
+func noSurf(next http.Handler) http.Handler {
+	csrfHandler := nosurf.New(next)
+
+	csrfHandler.SetBaseCookie(http.Cookie{
+		HttpOnly: true,
+		Path:     "/",
+		Secure:   true,
+	})
+
+	return csrfHandler
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"github.com/justinas/nosurf"
 	"net/http"
 	"runtime/debug"
 	"time"
@@ -97,5 +98,8 @@ func (app *application) defaultTemplateData(
 
 	// Add flash message to the template
 	td.Flash = app.session.PopString(r, "flash")
+
+	//Add CSRF token to the templateData struct
+	td.CSRFToken = nosurf.Token(r)
 	return td
 }
