@@ -11,11 +11,11 @@
 
                     <div class="panel-body">
                         <div class="page-header"></div>
+                        {{with .Form }}
+                        {{with .Errors.Get "generic" }}
+                            <div class="text-danger my-2" role="alert">{{.}}</div>
+                        {{end}}
                         <form method="POST" action="/user/login" novalidate>
-                            {{with .Form }}
-                                {{with .Errors.Get "generic" }}
-                                    <div class="text-danger alert-danger my-2" role="alert">{{.}}</div>
-                                {{end}}
                                 <div class="form-group">
                                     <label for="email">Email</label>
                                     <input
@@ -26,6 +26,9 @@
                                             name="email"
                                             value='{{.Get "email"}}'
                                     />
+                                    {{with .Errors.Get "email" }}
+                                     <small  class="text-danger my-2" role="alert">{{.}}</small>
+                                    {{end}}
                                 </div>
                                 <div class="form-group">
                                     <label for="password">Password</label>
@@ -36,6 +39,9 @@
                                             name="password"
                                             placeholder="*****"
                                     />
+                                    {{with .Errors.Get "password" }}
+                                        <small class="text-danger my-2" role="alert">{{.}}</small>
+                                    {{end}}
                                 </div>
                                 <button type="submit" class="btn btn-primary">
                                     Login
