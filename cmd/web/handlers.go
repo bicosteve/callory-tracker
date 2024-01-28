@@ -17,9 +17,9 @@ func (app *application) getHome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := 1
+	userId := app.session.GetInt(r, "userId")
 
-	foods, err := app.foods.GetFoods(userID)
+	foods, err := app.foods.GetFoods(userId)
 	if err != nil {
 		app.serverError(w, err)
 		return

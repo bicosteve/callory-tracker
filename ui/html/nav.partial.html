@@ -6,15 +6,26 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav mr-auto">
-                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/food/add">Add Food</a></li>
-<!--                    <li class="nav-item"><a class="nav-link" href="/food/day">Day</a></li>-->
+                    {{if .AuthenticatedUser}}
+                        <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/food/add">Add Food</a></li>
+                    {{end}}
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li class="nav-item"><a class="nav-link" href="/user/me">Hi,{Bix}</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/user/logout">Logout</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/user/login">Login</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/user/register">Register</a></li>
+                    {{if .AuthenticatedUser}}
+                        <li class="nav-item"><a class="nav-link" href="/user/me">Hi,{Bix}</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link">
+                                <form class="logout" action="/user/logout" method="POST">
+                                    <input type="hidden" name="csrf_token">
+                                    <button class="btn btn-outline-danger" type="submit">Logout</button>
+                                </form>
+                            </a>
+                        </li>
+                    {{else}}
+                        <li class="nav-item"><a class="nav-link" href="/user/login">Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/user/register">Register</a></li>
+                    {{end}}
                 </ul>
             </div>
         </div>

@@ -4,7 +4,6 @@ import (
 	"github.com/bicosteve/callory-tracker/pkg/forms"
 	"github.com/bicosteve/callory-tracker/pkg/models"
 	"html/template"
-	"net/url"
 	"path/filepath"
 	"time"
 )
@@ -24,15 +23,14 @@ var functions = template.FuncMap{
 
 // templateData struct will hold any dynamic data that we want to pass to HTM Templates
 type templateData struct {
-	User        *models.User
-	Food        *models.Food
-	Foods       []*models.Food
-	Total       *models.Food
-	CurrentYear int
-	FormData    url.Values        /*repopulating the form with submitted data*/
-	FormErrors  map[string]string // holding form input error messages
-	Form        *forms.Form
-	Flash       string
+	User              *models.User
+	Food              *models.Food
+	Foods             []*models.Food
+	Total             *models.Food
+	CurrentYear       int
+	Form              *forms.Form
+	Flash             string
+	AuthenticatedUser int
 }
 
 // Used for template caching when the application starts
