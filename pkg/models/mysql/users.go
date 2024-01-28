@@ -69,8 +69,8 @@ func (u *UserModel) LoginUser(email, password string) (int, error) {
 
 func (u *UserModel) GetUserDetails(id int) (*models.User, error) {
 	user := &models.User{}
-	stm := "SELECT username,email,created_at FROM users WHERE id = ?"
-	err := u.DB.QueryRow(stm, id).Scan(&user.Username, &user.Email, &user.CreatedAt)
+	stm := "SELECT id,username,email,created_at FROM users WHERE id = ?"
+	err := u.DB.QueryRow(stm, id).Scan(&user.ID, &user.Username, &user.Email, &user.CreatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, models.ErrNoRecord
 	}
@@ -81,3 +81,11 @@ func (u *UserModel) GetUserDetails(id int) (*models.User, error) {
 
 	return user, nil
 }
+
+//func (u *UserModel) Exists(id int) (bool, error) {
+//	var exists bool
+//
+//	stm := "SELECT EXISTS(SELECT true FROM users WHERE id = ?)"
+//	err := u.DB.QueryRow(stm, id).Scan(&exists)
+//	return exists, err
+//}

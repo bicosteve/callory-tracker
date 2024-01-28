@@ -24,6 +24,10 @@ type application struct {
 	session       *sessions.Session
 }
 
+type contextKey string
+
+const contextKeyUser = contextKey("user")
+
 func main() {
 	// infoLog: logging info messages
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
@@ -78,7 +82,7 @@ func main() {
 	}
 
 	session := sessions.New([]byte(secret))
-	session.Lifetime = 12 * time.Hour
+	session.Lifetime = 20 * time.Second
 	session.Secure = true
 	session.SameSite = http.SameSiteStrictMode
 

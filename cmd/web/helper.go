@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"github.com/bicosteve/callory-tracker/pkg/models"
 	"github.com/justinas/nosurf"
 	"net/http"
 	"runtime/debug"
@@ -73,8 +74,12 @@ func (app *application) renderATemplate(
 }
 
 //isAuthenticatedUser returns the ID of user in session and if not will return 0
-func (app *application) isAuthenticatedUser(r *http.Request) int {
-	return app.session.GetInt(r, "userId")
+func (app *application) isAuthenticatedUser(r *http.Request) *models.User {
+	user, ok := r.Context().Value(contextKeyUser).(*models.User)
+	if !ok {
+		return nil
+	}
+	return user
 }
 
 /*
