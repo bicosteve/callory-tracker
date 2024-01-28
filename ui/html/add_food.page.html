@@ -12,6 +12,7 @@
                     <div class="panel-body">
                         <div class="page-header"></div>
                         <form  action="/food/add" method="POST" novalidate>
+                            <input type="hidden" name="csrf_token" value='{{.CSRFToken}}'>
                             {{with .Form}}
                                 <div class="form-group">
                                     <label for="meal">Meal</label>

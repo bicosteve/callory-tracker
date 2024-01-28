@@ -42,7 +42,7 @@ func (u *UserModel) LoginUser(email, password string) (int, error) {
 	var id int
 	var hash []byte
 
-	stm := `SELECT email, hashed_password FROM users WHERE email = ?`
+	stm := `SELECT id, hashed_password FROM users WHERE email = ?`
 	row := u.DB.QueryRow(stm, email)
 	err := row.Scan(&id, &hash)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -64,7 +64,7 @@ func (u *UserModel) LoginUser(email, password string) (int, error) {
 	}
 
 	// Match is correct
-	return id, nil
+	return int(id), nil
 }
 
 func (u *UserModel) GetUserDetails(id int) (*models.User, error) {

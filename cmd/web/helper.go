@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"github.com/justinas/nosurf"
 	"net/http"
 	"runtime/debug"
 	"time"
@@ -71,6 +72,11 @@ func (app *application) renderATemplate(
 	buffer.WriteTo(w)
 }
 
+//isAuthenticatedUser returns the ID of user in session and if not will return 0
+func (app *application) isAuthenticatedUser(r *http.Request) int {
+	return app.session.GetInt(r, "userId")
+}
+
 /*
 defaultTemplateData -> takes pointer to templateData struct
 1. Adds the current year to the CurrentYear field
@@ -84,9 +90,16 @@ func (app *application) defaultTemplateData(
 		td = &templateData{}
 	}
 
+	// adds authenticated user to template
+	td.AuthenticatedUser = app.isAuthenticatedUser(r)
+
+	// Adds current year to template
 	td.CurrentYear = time.Now().Year()
 
-	// Add flash message to the template data if one exists
+	// Add flash message to the template
 	td.Flash = app.session.PopString(r, "flash")
+
+	//Add CSRF token to the templateData struct
+	td.CSRFToken = nosurf.Token(r)
 	return td
 }

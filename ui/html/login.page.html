@@ -6,40 +6,30 @@
             <div>
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Register</h3>
+                        <h3 class="panel-title">Login</h3>
                     </div>
 
                     <div class="panel-body">
                         <div class="page-header"></div>
-                        <form method="POST" action="/user/register" novalidate>
+
+                        <form method="POST" action="/user/login" novalidate>
                             <input type="hidden" name="csrf_token" value='{{.CSRFToken}}'>
-                            {{with .Form}}
-                                <div class="form-group">
-                                    <label for="username">Username</label>
-                                    <input
-                                            type="text"
-                                            class="form-control"
-                                            id="username"
-                                            name="username"
-                                            placeholder="Username"
-                                            value='{{.Get "username"}}'
-                                    />
-                                    {{with .Errors.Get "username" }}
-                                        <small class="text-danger">{{.}}</small>
-                                    {{end}}
-                                </div>
+                            {{with .Form }}
+                                {{with .Errors.Get "generic" }}
+                                    <div class="text-danger my-2" role="alert">{{.}}</div>
+                                {{end}}
                                 <div class="form-group">
                                     <label for="email">Email</label>
                                     <input
                                             type="text"
                                             class="form-control"
                                             id="email"
-                                            name="email"
                                             placeholder="example@example.com"
+                                            name="email"
                                             value='{{.Get "email"}}'
                                     />
                                     {{with .Errors.Get "email" }}
-                                    <small class="text-danger">{{.}}</small>
+                                     <small  class="text-danger my-2" role="alert">{{.}}</small>
                                     {{end}}
                                 </div>
                                 <div class="form-group">
@@ -52,24 +42,11 @@
                                             placeholder="*****"
                                     />
                                     {{with .Errors.Get "password" }}
-                                    <small class="text-danger">{{.}}</small>
-                                    {{end}}
-                                </div>
-                                <div class="form-group">
-                                    <label for="confirm_password">Confirm Password</label>
-                                    <input
-                                            type="password"
-                                            class="form-control"
-                                            id="confirm_password"
-                                            name="confirm_password"
-                                            placeholder="*****"
-                                    />
-                                    {{with .Errors.Get "confirm_password" }}
-                                         <small class="text-danger">{{.}}</small>
+                                        <small class="text-danger my-2" role="alert">{{.}}</small>
                                     {{end}}
                                 </div>
                                 <button type="submit" class="btn btn-primary">
-                                    Register
+                                    Login
                                 </button>
                             {{end}}
                         </form>

@@ -78,9 +78,9 @@ func (f *FoodModel) GetFoodTotal(createdAt time.Time) (*models.Food, error) {
 	return total, nil
 }
 
-func (f *FoodModel) GetFoods(userid int) ([]*models.Food, error) {
+func (f *FoodModel) GetFoods(userId int) ([]*models.Food, error) {
 	stm := "SELECT * FROM foods WHERE userId = ? ORDER BY created_at DESC LIMIT 100"
-	rows, err := f.DB.Query(stm, userid)
+	rows, err := f.DB.Query(stm, userId)
 	if err != nil {
 		return nil, err
 	}

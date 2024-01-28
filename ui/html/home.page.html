@@ -29,20 +29,26 @@
                                     <li>
                                         <a>Calories: <span class="badge">{{ .Calories}}</span></a>
                                     </li>
-                                    <li>
-                                        <a href="/food/day?foodId={{ .ID}}&userId={{.UserID}}" type="button" class="btn btn-link"
-                                        >View Details</a
-                                        >
-                                    </li>
+                                        <li>
+                                            <a href="/food/day?foodId={{ .ID}}&userId={{.UserID}}" type="button" class="btn btn-link"
+                                            >View Details</a
+                                            >
+                                        </li>
                                 </ul>
                             </div>
                         </div>
                     {{end}}
                 {{else}}
-                    <p>You have no foods</p>
+                    <div class="jumbotron">
+                        <h1 class="display-4">Achieve Your Health Goals with Calory Tracker: The Ultimate Solution for a Balanced Lifestyle!</h1>
+                        <p class="lead">Track the quantity of what you consume for more balanced lifestyle! With Calory Tracker, you can finally achieve your health goals without sacrificing taste or satisfaction.</p>
+                        <hr class="my-4">
+                        <p>Register To Start</p>
+                        <p class="lead">
+                            <a class="btn btn-primary btn-lg" href="/user/register" role="button">Register</a>
+                        </p>
+                    </div>
                 {{end}}
-
-
             </div>
         </div>
     </div>
