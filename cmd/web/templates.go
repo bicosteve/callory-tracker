@@ -1,11 +1,12 @@
 package main
 
 import (
-	"github.com/bicosteve/callory-tracker/pkg/forms"
-	"github.com/bicosteve/callory-tracker/pkg/models"
 	"html/template"
 	"path/filepath"
 	"time"
+
+	"github.com/bicosteve/callory-tracker/pkg/forms"
+	"github.com/bicosteve/callory-tracker/pkg/models"
 )
 
 /*
@@ -51,6 +52,8 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 		// extract the filename e.g home.page.html
 		// assign it to the name variable
 		name := filepath.Base(page)
+
+		
 
 		/*
 			1. Parse the page template file in to a template set

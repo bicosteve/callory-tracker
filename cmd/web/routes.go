@@ -1,14 +1,23 @@
 package main
 
 import (
-	"github.com/justinas/alice"
 	"net/http"
+
+	"github.com/bicosteve/callory-tracker/ui"
+	"github.com/justinas/alice"
 
 	"github.com/go-chi/chi/v5"
 )
 
 func (app *application) routes() http.Handler {
 	router := chi.NewRouter()
+
+	// take embedded filesystem and convert it to http.FS type
+	var fileServer = http.FS(ui.Files)
+	fs := http.FileServer(fileServer)
+
+	// serving static files/css with embed
+	router.Handle("/css/*",fs)
 
 	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, secureHeaders, noSurf, app.authenticate)
 
