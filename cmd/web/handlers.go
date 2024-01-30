@@ -93,13 +93,13 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
 	foodID, err := strconv.Atoi(r.URL.Query().Get("foodId"))
-	userID, err := strconv.Atoi(r.URL.Query().Get("userId"))
-
 	if err != nil || foodID < 1 {
 		app.notFound(w)
 		return
 	}
 
+
+	userID, err := strconv.Atoi(r.URL.Query().Get("userId"))
 	if err != nil || userID < 1 {
 		app.notFound(w)
 		return
