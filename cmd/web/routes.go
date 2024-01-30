@@ -17,7 +17,7 @@ func (app *application) routes() http.Handler {
 	fs := http.FileServer(fileServer)
 
 	// serving static files/css with embed
-	router.Handle("/css/*",fs)
+	router.Handle("/css/*", fs)
 
 	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, secureHeaders, noSurf, app.authenticate)
 
@@ -27,7 +27,8 @@ func (app *application) routes() http.Handler {
 		r.Get("/food/add", app.postFoodForm)
 		r.Post("/food/add", app.postFood)
 		r.Get("/food/day", app.getDay)
-		r.Get("/food/edit",app.getEditPage)
+		r.Get("/food/edit", app.editFoodForm)
+		r.Post("/food/edit", app.editFood)
 
 	})
 

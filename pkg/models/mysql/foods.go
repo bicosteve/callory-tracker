@@ -113,7 +113,7 @@ func (f *FoodModel) GetFoods(userId int) ([]*models.Food, error) {
 	return foods, nil
 }
 
-func (f *FoodModel) UpdateFood(foodId, userId int) (int, error) {
+func (f *FoodModel) UpdateFood(meal string, name string, protein, cabs, fat, calory, foodId, userId int) (int, error) {
 	stm := `UPDATE foods SET name = ?, protein = ?, carbohydrates = ?, fat = ?, 
                  calory = ?, updated_at = UTC_TIMESTAMP()  WHERE id = ? AND userId = ?`
 	result, err := f.DB.Exec(stm, foodId, userId)
