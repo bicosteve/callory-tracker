@@ -91,29 +91,80 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/food/day?foodId=%d&userId=%d", id, userId), http.StatusSeeOther)
 }
 
-func (app *application)getEditPage(w http.ResponseWriter, r *http.Request){
+func (app *application) editFoodForm(w http.ResponseWriter, r *http.Request) {
 	foodId, err := strconv.Atoi(r.URL.Query().Get("foodId"))
-	if err != nil {
-		app.clientError(w,http.StatusBadRequest)
-		return 
+	if err != nil || foodId < 1 {
+		app.clientError(w, http.StatusBadRequest)
+		return
 	}
 
 	userID, err := strconv.Atoi(r.URL.Query().Get("userId"))
-	if err != nil {
-		app.clientError(w,http.StatusBadRequest)
-		return 
+	if err != nil || userID < 1 {
+		app.clientError(w, http.StatusBadRequest)
+		return
 	}
 
-	food, err := app.foods.GetFood(foodId,userID)
+	food, err := app.foods.GetFood(foodId, userID)
 	if err != nil {
-		app.serverError(w,err)
-		return 
+		app.serverError(w, err)
+		return
 	}
 
-
-	app.renderATemplate(w,r,"edit_food.page.html",&templateData{Form:forms.NewForm(nil),Food: food})
+	app.renderATemplate(w, r, "edit_food.page.html", &templateData{Form: forms.NewForm(nil), Food: food})
 }
 
+func (app *application) editFood(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allow", "POST")
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	foodId, err := strconv.Atoi(r.URL.Query().Get("foodId"))
+	if err != nil || foodId < 1 {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	userId := app.session.GetInt(r, "userId")
+
+	err = r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form := forms.NewForm(r.PostForm)
+	form.Required("meal", "name", "protein", "carbohydrates", "fat")
+	form.MaxLength("name", 20)
+	form.MinValue(1, "protein", "carbohydrates", "fat")
+
+	if !form.Valid() {
+		app.renderATemplate(w, r, "edit_food.page.html",
+			&templateData{Form: form})
+		return
+	}
+
+	meal := form.Get("meal")
+	name := form.Get("name")
+	protein, _ := strconv.Atoi(form.Get("protein"))
+	cabs, _ := strconv.Atoi(form.Get("carbohydrates"))
+	fat, _ := strconv.Atoi(form.Get("fat"))
+	calories := (protein * cal) + (cabs * cal) + (fat * cal)
+
+	id, err := app.foods.UpdateFood(meal, name, protein, cabs, fat, calories, foodId, userId)
+
+	if err != nil {
+		app.serverError(w, err)
+		app.errorLog.Println(err)
+		return
+	}
+
+	app.session.Put(r, "flash", fmt.Sprintf("%s updated successfully", name))
+	http.Redirect(w, r, fmt.Sprintf("/food/day?foodId=%d&userId=%d", foodId, userId), http.StatusSeeOther)
+
+	_ = id
+}
 
 func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
 	foodID, err := strconv.Atoi(r.URL.Query().Get("foodId"))
@@ -121,7 +172,6 @@ func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
-
 
 	userID, err := strconv.Atoi(r.URL.Query().Get("userId"))
 	if err != nil || userID < 1 {
@@ -238,7 +288,6 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
 	// Use the RenewToken() method on the current session to change session ID.
 	// This is good practise
-
 
 	// Logout means removing the userId from the session
 	app.session.Remove(r, "userId")
