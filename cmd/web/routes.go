@@ -28,7 +28,7 @@ func (app *application) routes() http.Handler {
 		r.Post("/food/add", app.postFood)
 		r.Get("/food/day", app.getDay)
 		r.Get("/food/edit", app.editFoodForm)
-		r.Post("/food/edit", app.editFood)
+		r.Post("/food/update", app.editFood)
 
 	})
 
