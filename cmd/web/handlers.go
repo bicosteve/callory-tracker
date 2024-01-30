@@ -122,28 +122,22 @@ func (app *application) editFood(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	foodId, err := strconv.Atoi(r.URL.Query().Get("foodId"))
+	err := r.ParseForm()
+	if err != nil {
+		app.errorLog.Println(err)
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	foodId, err := strconv.Atoi(r.FormValue("foodId"))
 	fmt.Println(foodId)
 	if err != nil || foodId < 1 {
 		app.errorLog.Println(err)
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
-
-	userId, err := strconv.Atoi(r.URL.Query().Get("foodId"))
-	fmt.Println(userId)
+	userId, err := strconv.Atoi(r.FormValue("userId"))
 	if err != nil || userId < 1 {
-		app.errorLog.Println(err)
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	//userId := app.session.GetInt(r, "userId")
-	app.infoLog.Println(userId)
-	app.infoLog.Println(foodId)
-
-	err = r.ParseForm()
-	if err != nil {
 		app.errorLog.Println(err)
 		app.clientError(w, http.StatusBadRequest)
 		return
