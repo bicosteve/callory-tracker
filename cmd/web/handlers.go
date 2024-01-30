@@ -110,26 +110,41 @@ func (app *application) editFoodForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.renderATemplate(w, r, "edit_food.page.html", &templateData{Form: forms.NewForm(nil), Food: food})
+	app.renderATemplate(w, r, "edit_food.page.html", &templateData{
+		Form: forms.NewForm(nil), Food: food,
+	})
 }
 
 func (app *application) editFood(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", "POST")
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}
 
 	foodId, err := strconv.Atoi(r.URL.Query().Get("foodId"))
+	fmt.Println(foodId)
 	if err != nil || foodId < 1 {
+		app.errorLog.Println(err)
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
-	userId := app.session.GetInt(r, "userId")
+	userId, err := strconv.Atoi(r.URL.Query().Get("foodId"))
+	fmt.Println(userId)
+	if err != nil || userId < 1 {
+		app.errorLog.Println(err)
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	//userId := app.session.GetInt(r, "userId")
+	app.infoLog.Println(userId)
+	app.infoLog.Println(foodId)
 
 	err = r.ParseForm()
 	if err != nil {
+		app.errorLog.Println(err)
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
@@ -153,6 +168,7 @@ func (app *application) editFood(w http.ResponseWriter, r *http.Request) {
 	calories := (protein * cal) + (cabs * cal) + (fat * cal)
 
 	id, err := app.foods.UpdateFood(meal, name, protein, cabs, fat, calories, foodId, userId)
+	_ = id
 
 	if err != nil {
 		app.serverError(w, err)
@@ -161,9 +177,7 @@ func (app *application) editFood(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.session.Put(r, "flash", fmt.Sprintf("%s updated successfully", name))
-	http.Redirect(w, r, fmt.Sprintf("/food/day?foodId=%d&userId=%d", foodId, userId), http.StatusSeeOther)
-
-	_ = id
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
@@ -191,7 +205,8 @@ func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.renderATemplate(w, r, "day.page.html", &templateData{
-		Food: food})
+		Food: food,
+	})
 }
 
 func (app *application) getRegisterPage(w http.ResponseWriter, r *http.Request) {
