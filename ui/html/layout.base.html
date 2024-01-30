@@ -1,87 +1,53 @@
 {{define "base" }}
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+      crossorigin="anonymous"
+    />
 
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css"
+      integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+      crossorigin="anonymous"
+    />
 
-        <title>Calory Tracker | {{ block "title" .}}{{end}}</title>
-        <style>
-            body {
-                padding-top: 70px;
-                padding-bottom: 30px;
-            }
-            .theme-dropdown .dropdown-menu {
-                position: static;
-                display: block;
-                margin-bottom: 20px;
-            }
+    <link rel="stylesheet" href="../css/theme.css" />
 
-            /*.theme-showcase {*/
-            /*    position: relative;*/
-            /*    min-height: 75vh;*/
-            /*}*/
-            
-            .theme-showcase > p > .btn {
-                margin: 5px 0;
-            }
-            
-            .theme-showcase .navbar .container {
-                width: auto;
-            }
+    <title>Calory Tracker | {{ block "title" .}}{{end}}</title>
+  </head>
+  <body>
+    {{template "nav" .}}
+    <!--Navbar--->
 
-            .footer {
-                position: absolute;
-                bottom: 0;
-                width: 100%;
-                height: 2rem;
-                z-index: 10;
-            }
+    <!---Flash message--->
+    {{with .Flash}}
+    <div class="container">
+      <div class="col-sm-6 col-sm-offset-3">
+        <div class="row">
+          <div class="alert alert-success my-1" role="alert">{{.}}</div>
+        </div>
+      </div>
+    </div>
+    {{end}}
 
-            .logout button{
-                background-color: grey;
-                border-color: red;
-                color: red;
-                padding: 5px 10px;
-                text-align: center;
-                text-decoration: none;
-                display: inline-block;
-                border-radius: 4px;
-            }
-
-            .footer .copyright {
-                margin-bottom: 1rem;
-            }
-        </style>
-    </head>
-        <body>
-            {{template "nav" .}} <!--Navbar--->
-
-            <!---Flash message--->
-            {{with .Flash}}
-                <div class="container">
-                    <div class="col-sm-6 col-sm-offset-3">
-                        <div class="row">
-                            <div class="alert alert-success my-1" role="alert">
-                                {{.}}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {{end}}
-
-            <!---Body Content--->
-            {{block "content" .}}
-
-            {{end}}
-<!--            {{template "footer" .}}-->
-        </body>
-            {{block "js" .}} {{end}}
-            <!--JS-->
-            <!-- Latest compiled and minified JavaScript -->
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    </html>
+    <!---Body Content--->
+    {{block "content" .}} {{end}}
+    <!--            {{template "footer" .}}-->
+  </body>
+  {{block "js" .}} {{end}}
+  <!--JS-->
+  <!-- Latest compiled and minified JavaScript -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+    integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+    crossorigin="anonymous"
+  ></script>
+</html>
 {{end}}

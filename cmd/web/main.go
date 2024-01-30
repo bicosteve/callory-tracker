@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/golangcollege/sessions"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/golangcollege/sessions"
 
 	"github.com/bicosteve/callory-tracker/pkg/db"
 	"github.com/bicosteve/callory-tracker/pkg/helpers"
@@ -82,7 +83,7 @@ func main() {
 	}
 
 	session := sessions.New([]byte(secret))
-	session.Lifetime = 20 * time.Second
+	session.Lifetime = 12 * time.Hour
 	session.Secure = true
 	session.SameSite = http.SameSiteStrictMode
 

@@ -3,10 +3,11 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/bicosteve/callory-tracker/pkg/forms"
-	"github.com/bicosteve/callory-tracker/pkg/models"
 	"net/http"
 	"strconv"
+
+	"github.com/bicosteve/callory-tracker/pkg/forms"
+	"github.com/bicosteve/callory-tracker/pkg/models"
 )
 
 const cal = 4
@@ -211,6 +212,10 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
+	// Use the RenewToken() method on the current session to change session ID.
+	// This is good practise
+
+
 	// Logout means removing the userId from the session
 	app.session.Remove(r, "userId")
 	app.session.Put(r, "flash", "You have successfully logout")
