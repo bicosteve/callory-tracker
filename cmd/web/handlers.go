@@ -91,6 +91,30 @@ func (app *application) postFood(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/food/day?foodId=%d&userId=%d", id, userId), http.StatusSeeOther)
 }
 
+func (app *application)getEditPage(w http.ResponseWriter, r *http.Request){
+	foodId, err := strconv.Atoi(r.URL.Query().Get("foodId"))
+	if err != nil {
+		app.clientError(w,http.StatusBadRequest)
+		return 
+	}
+
+	userID, err := strconv.Atoi(r.URL.Query().Get("userId"))
+	if err != nil {
+		app.clientError(w,http.StatusBadRequest)
+		return 
+	}
+
+	food, err := app.foods.GetFood(foodId,userID)
+	if err != nil {
+		app.serverError(w,err)
+		return 
+	}
+
+
+	app.renderATemplate(w,r,"edit_food.page.html",&templateData{Form:forms.NewForm(nil),Food: food})
+}
+
+
 func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
 	foodID, err := strconv.Atoi(r.URL.Query().Get("foodId"))
 	if err != nil || foodID < 1 {

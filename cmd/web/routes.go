@@ -27,6 +27,7 @@ func (app *application) routes() http.Handler {
 		r.Get("/food/add", app.postFoodForm)
 		r.Post("/food/add", app.postFood)
 		r.Get("/food/day", app.getDay)
+		r.Get("/food/edit",app.getEditPage)
 
 	})
 
