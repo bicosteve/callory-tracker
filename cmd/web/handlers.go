@@ -122,27 +122,7 @@ func (app *application) editFood(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	foodId, err := strconv.Atoi(r.URL.Query().Get("foodId"))
-	fmt.Println(foodId)
-	if err != nil || foodId < 1 {
-		app.errorLog.Println(err)
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	userId, err := strconv.Atoi(r.URL.Query().Get("foodId"))
-	fmt.Println(userId)
-	if err != nil || userId < 1 {
-		app.errorLog.Println(err)
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	//userId := app.session.GetInt(r, "userId")
-	app.infoLog.Println(userId)
-	app.infoLog.Println(foodId)
-
-	err = r.ParseForm()
+	err := r.ParseForm()
 	if err != nil {
 		app.errorLog.Println(err)
 		app.clientError(w, http.StatusBadRequest)
@@ -150,9 +130,9 @@ func (app *application) editFood(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := forms.NewForm(r.PostForm)
-	form.Required("meal", "name", "protein", "carbohydrates", "fat")
+	form.Required("meal", "name", "protein", "carbohydrate", "fat")
 	form.MaxLength("name", 20)
-	form.MinValue(1, "protein", "carbohydrates", "fat")
+	form.MinValue(1, "protein", "carbohydrate", "fat")
 
 	if !form.Valid() {
 		app.renderATemplate(w, r, "edit_food.page.html",
@@ -160,10 +140,12 @@ func (app *application) editFood(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	foodId, _ := strconv.Atoi(form.Get("foodId"))
+	userId := app.session.GetInt(r, "userId")
 	meal := form.Get("meal")
 	name := form.Get("name")
 	protein, _ := strconv.Atoi(form.Get("protein"))
-	cabs, _ := strconv.Atoi(form.Get("carbohydrates"))
+	cabs, _ := strconv.Atoi(form.Get("carbohydrate"))
 	fat, _ := strconv.Atoi(form.Get("fat"))
 	calories := (protein * cal) + (cabs * cal) + (fat * cal)
 
@@ -177,7 +159,8 @@ func (app *application) editFood(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.session.Put(r, "flash", fmt.Sprintf("%s updated successfully", name))
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+
+	http.Redirect(w, r, fmt.Sprintf("/food/day?foodId=%d&userId=%d", foodId, userId), http.StatusSeeOther)
 }
 
 func (app *application) getDay(w http.ResponseWriter, r *http.Request) {

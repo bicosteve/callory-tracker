@@ -81,11 +81,3 @@ func (u *UserModel) GetUserDetails(id int) (*models.User, error) {
 
 	return user, nil
 }
-
-//func (u *UserModel) Exists(id int) (bool, error) {
-//	var exists bool
-//
-//	stm := "SELECT EXISTS(SELECT true FROM users WHERE id = ?)"
-//	err := u.DB.QueryRow(stm, id).Scan(&exists)
-//	return exists, err
-//}

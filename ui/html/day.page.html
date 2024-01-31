@@ -50,7 +50,7 @@
                 </li>
                 <li>
                 <a
-                    >Carbohydates: <span class="badge">{{ .Carbohydrates}}</span></a
+                    >Carbohydrates: <span class="badge">{{ .Carbohydrates}}</span></a
                 >
                 </li>
                 <li>
@@ -66,8 +66,13 @@
 
             <div class="panel-body">
             <div class="delete-edit">
-                <button type="button" class="btn btn-dark" ><a class="edit" href="/food/edit?foodId={{ .ID}}&userId={{.UserID}}">Edit</a></button>
-                <button type="button" class="btn btn-danger" ><a class="delete" href="#">Delete</a></li>
+                <button type="button" class="btn btn-dark" ><a class="edit" href="/food/get-edit?foodId={{ .ID}}&userId={{.UserID}}">Edit</a></button>
+                <div class="delete-form" type="button" class="btn btn-danger" >
+                    <form class="delete" action="/food/delete" method="POST">
+                        <input type="hidden" name="foodId" value="{{ .ID}}">
+                        <input class="delete-button" type="submit" value="Delete">
+                    </form>
+                </div>
             </div>
             </div>
         {{end}}

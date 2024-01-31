@@ -64,3 +64,10 @@ body {
   color: white;
   text-decoration: none;
 }
+
+.delete-button {
+  background-color: red;
+  font-size: 2rem;
+  padding: 5px 5px;
+  border-radius: 5px;
+}
