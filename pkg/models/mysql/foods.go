@@ -114,8 +114,7 @@ func (f *FoodModel) GetFoods(userId int) ([]*models.Food, error) {
 }
 
 func (f *FoodModel) UpdateFood(meal string, name string, protein, cabs, fat, calory, foodId, userId int) (int, error) {
-	stm := `UPDATE foods SET meal = ?, name = ?, protein = ?, carbohydrate = ?, fat = ?, 
-                 calories = ?, updated_at = UTC_TIMESTAMP()  WHERE id = ? AND userId = ?`
+	stm := `UPDATE foods SET meal = ?, name = ?, protein = ?, carbohydrate = ?, fat = ?, calories = ?, updated_at = UTC_TIMESTAMP()  WHERE id = ? AND userId = ?`
 	result, err := f.DB.Exec(stm, meal, name, protein, cabs, fat, calory, foodId, userId)
 	if err != nil {
 		return 0, err

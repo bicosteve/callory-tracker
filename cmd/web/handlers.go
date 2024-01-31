@@ -163,6 +163,32 @@ func (app *application) editFood(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/food/day?foodId=%d&userId=%d", foodId, userId), http.StatusSeeOther)
 }
 
+func (app *application)deleteFood(w http.ResponseWriter, r *http.Request){
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allowed", "POST")
+		app.clientError(w,http.StatusMethodNotAllowed)
+		return 
+	}
+
+	foodId,err := strconv.Atoi(r.FormValue("foodId"))
+	if err != nil {
+		app.clientError(w,http.StatusBadRequest)
+		return 
+	}
+
+	userId := app.session.GetInt(r,"userId")
+
+	id, err := app.foods.DeleteFood(foodId,userId)
+	if err != nil {
+		app.serverError(w,err)
+		return 
+	}
+
+	app.session.Put(r,"flash",fmt.Sprintf("%d item deleted",id))
+
+	http.Redirect(w,r,"/",http.StatusSeeOther)
+}
+
 func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
 	foodID, err := strconv.Atoi(r.URL.Query().Get("foodId"))
 	if err != nil || foodID < 1 {
