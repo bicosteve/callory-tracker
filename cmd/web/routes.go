@@ -31,6 +31,7 @@ func (app *application) routes() http.Handler {
 		r.Post("/food/edit", app.editFood)
 		r.Post("/food/delete", app.deleteFood)
 		r.Post("/food/total", app.totalFoodConsumption)
+		r.Get("/user/me", app.getUser)
 	})
 
 	router.Get("/", app.getHome)
