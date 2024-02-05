@@ -3,10 +3,11 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/bicosteve/callory-tracker/pkg/forms"
-	"github.com/bicosteve/callory-tracker/pkg/models"
 	"net/http"
 	"strconv"
+
+	"github.com/bicosteve/callory-tracker/pkg/forms"
+	"github.com/bicosteve/callory-tracker/pkg/models"
 )
 
 const cal = 4
@@ -355,4 +356,10 @@ func (app *application) getUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	app.renderATemplate(w, r, "user.page.html", &templateData{User: user})
+}
+
+// 404 page not found
+func (app *application) pageNotFound(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
+	app.renderATemplate(w, r, "notfound.page.html", nil)
 }

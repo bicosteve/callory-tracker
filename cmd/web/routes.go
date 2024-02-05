@@ -40,6 +40,7 @@ func (app *application) routes() http.Handler {
 	router.Post("/user/register", app.registerUser)
 	router.Post("/user/login", app.loginUser)
 	router.Post("/user/logout", app.logoutUser)
+	router.NotFound(app.pageNotFound) // 404 not found!
 
 	return standardMiddleware.Then(router)
 }
