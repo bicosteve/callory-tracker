@@ -3,11 +3,10 @@ package main
 import (
 	"errors"
 	"fmt"
-	"net/http"
-	"strconv"
-
 	"github.com/bicosteve/callory-tracker/pkg/forms"
 	"github.com/bicosteve/callory-tracker/pkg/models"
+	"net/http"
+	"strconv"
 )
 
 const cal = 4
@@ -27,6 +26,35 @@ func (app *application) getHome(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.renderATemplate(w, r, "home.page.html", &templateData{Foods: foods})
+
+}
+
+func (app *application) totalFoodConsumption(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form := forms.NewForm(r.PostForm)
+	form.Required("day")
+
+	if !form.Valid() {
+		app.renderATemplate(w, r, "day.page.html", &templateData{Form: form})
+		return
+	}
+
+	date := form.Get("day")
+	userId := app.session.GetInt(r, "userId")
+	fmt.Println(date)
+
+	foodTotal, err := app.foods.GetFoodTotal(userId, date)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	app.renderATemplate(w, r, "day.page.html", &templateData{Total: foodTotal})
 
 }
 
@@ -163,30 +191,30 @@ func (app *application) editFood(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/food/day?foodId=%d&userId=%d", foodId, userId), http.StatusSeeOther)
 }
 
-func (app *application)deleteFood(w http.ResponseWriter, r *http.Request){
+func (app *application) deleteFood(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allowed", "POST")
-		app.clientError(w,http.StatusMethodNotAllowed)
-		return 
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
 	}
 
-	foodId,err := strconv.Atoi(r.FormValue("foodId"))
+	foodId, err := strconv.Atoi(r.FormValue("foodId"))
 	if err != nil {
-		app.clientError(w,http.StatusBadRequest)
-		return 
+		app.clientError(w, http.StatusBadRequest)
+		return
 	}
 
-	userId := app.session.GetInt(r,"userId")
+	userId := app.session.GetInt(r, "userId")
 
-	id, err := app.foods.DeleteFood(foodId,userId)
+	id, err := app.foods.DeleteFood(foodId, userId)
 	if err != nil {
-		app.serverError(w,err)
-		return 
+		app.serverError(w, err)
+		return
 	}
 
-	app.session.Put(r,"flash",fmt.Sprintf("%d item deleted",id))
+	app.session.Put(r, "flash", fmt.Sprintf("%d item deleted", id))
 
-	http.Redirect(w,r,"/",http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func (app *application) getDay(w http.ResponseWriter, r *http.Request) {

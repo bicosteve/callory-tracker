@@ -8,33 +8,37 @@
         </div>
 
         <div class="panel-body">
-          <form method="POST" action="/">
-            <div class="form-group">
-              <select name="day" class="form-control">
-                <option>{{foodDate .Food.CreatedAt}}</option>
-              </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Calculate</button>
-          </form>
+          <!--Come back later-->
+<!--          <form method="POST" action="/food/total">-->
+<!--            <input type="hidden" name="csrf_token" value='{{.CSRFToken}}'>-->
+<!--            <div class="form-group">-->
+<!--              <select name="day" id="day" class="form-control">-->
+<!--                <option>{{foodDate .Food.CreatedAt}}</option>-->
+<!--              </select>-->
+<!--            </div>-->
+<!--            <button type="submit" class="btn btn-primary">Get Total</button>-->
+<!--          </form>-->
 
-          <div class="page-header"></div>
+<!--          <div class="page-header"></div>-->
 
-          <ul class="nav nav-pills" role="tablist">
-            <li class="active"><a>Total</a></li>
-            <li>
-              <a>Protein: <span class="badge">100</span></a>
-            </li>
-            <li>
-              <a>Carbs:<span class="badge">200</span></a>
-            </li>
-            <li>
-              <a>Fat: <span class="badge">50</span></a>
-            </li>
-            <li>
-              <a>Calories: <span class="badge">1650</span></a>
-            </li>
-          </ul>
-        </div>
+<!--         {{with .Total}}-->
+<!--            <ul class="nav nav-pills" role="tablist">-->
+<!--              <li class="active"><a>Total</a></li>-->
+<!--              <li>-->
+<!--                <a>Protein: <span class="badge">{{ .Protein}}</span></a>-->
+<!--              </li>-->
+<!--              <li>-->
+<!--                <a>Carbs:<span class="badge">200</span></a>-->
+<!--              </li>-->
+<!--              <li>-->
+<!--                <a>Fat: <span class="badge">50</span></a>-->
+<!--              </li>-->
+<!--              <li>-->
+<!--                <a>Calories: <span class="badge">1650</span></a>-->
+<!--              </li>-->
+<!--            </ul>-->
+<!--          {{end}}-->
+<!--        </div>-->
 
         <div class="page-header"></div>
 
