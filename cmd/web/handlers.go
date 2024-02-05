@@ -337,10 +337,6 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/food/add", http.StatusSeeOther)
 }
 
-func (app *application) getUser(w http.ResponseWriter, r *http.Request) {
-	app.renderATemplate(w, r, "user.page.html", &templateData{Form: forms.NewForm(nil)})
-}
-
 func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
 	// Use the RenewToken() method on the current session to change session ID.
 	// This is good practise
@@ -349,4 +345,14 @@ func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
 	app.session.Remove(r, "userId")
 	app.session.Put(r, "flash", "You have successfully logout")
 	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+}
+
+func (app *application) getUser(w http.ResponseWriter, r *http.Request) {
+	userId := app.session.GetInt(r, "userId")
+	user, err := app.users.GetUserDetails(userId)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	app.renderATemplate(w, r, "user.page.html", &templateData{User: user})
 }
