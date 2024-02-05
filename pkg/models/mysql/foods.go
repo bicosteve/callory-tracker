@@ -3,10 +3,8 @@ package mysql
 import (
 	"database/sql"
 	"errors"
-	"strings"
-	"time"
-
 	"github.com/bicosteve/callory-tracker/pkg/models"
+	"strings"
 )
 
 type FoodModel struct {
@@ -60,11 +58,14 @@ func (f *FoodModel) GetFood(foodId, userId int) (*models.Food, error) {
 	return food, nil
 }
 
-func (f *FoodModel) GetFoodTotal(createdAt time.Time) (*models.Food, error) {
+func (f *FoodModel) GetFoodTotal(
+	userId int, createdAt string,
+) (*models.Food, error) {
 	total := &models.Food{}
+	defer f.DB.Close()
 	stm := `SELECT SUM(protein), SUM(carbohydrate), SUM(fat), SUM(calories) 
-			FROM foods WHERE created_at LIKE "%?%" LIMIT 1`
-	row := f.DB.QueryRow(stm, createdAt)
+			FROM foods WHERE userId = ? AND created_at LIKE CONCAT('%',?)`
+	row := f.DB.QueryRow(stm, userId, createdAt)
 	err := row.Scan(&total.Protein, &total.Carbohydrates, &total.Fat, &total.Calories)
 
 	if errors.Is(err, sql.ErrNoRows) {
@@ -113,7 +114,9 @@ func (f *FoodModel) GetFoods(userId int) ([]*models.Food, error) {
 	return foods, nil
 }
 
-func (f *FoodModel) UpdateFood(meal string, name string, protein, cabs, fat, calory, foodId, userId int) (int, error) {
+func (f *FoodModel) UpdateFood(
+	meal string, name string, protein, cabs, fat, calory, foodId, userId int,
+) (int, error) {
 	stm := `UPDATE foods SET meal = ?, name = ?, protein = ?, carbohydrate = ?, fat = ?, calories = ?, updated_at = UTC_TIMESTAMP()  WHERE id = ? AND userId = ?`
 	result, err := f.DB.Exec(stm, meal, name, protein, cabs, fat, calory, foodId, userId)
 	if err != nil {
