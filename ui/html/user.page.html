@@ -1,0 +1,30 @@
+{{template "base" .}}
+{{ define "title" }} User {{end}}
+{{define "content" }}
+<div class="container theme-showcase col-sm-6 col-sm-offset-3" role="main">
+    <div class="row">
+        <div class="panel panel-primary" pb-4>
+            {{with .User }}
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{ .Username}}</h3>
+                </div>
+
+                <div class="page-header"></div>
+
+                <div class="card text-center">
+                    <div class="card-header">
+                        About
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ .Email}}</h5>
+                        <a href="/" class="btn btn-primary">Home</a>
+                    </div>
+                    <div class="card-footer text-muted" mb-4>
+                        Member Since {{neatDate .CreatedAt}}
+                    </div>
+                </div>
+            {{end}}
+        </div>
+    </div>
+</div>
+{{end}}

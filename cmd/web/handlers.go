@@ -346,3 +346,13 @@ func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
 	app.session.Put(r, "flash", "You have successfully logout")
 	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
+
+func (app *application) getUser(w http.ResponseWriter, r *http.Request) {
+	userId := app.session.GetInt(r, "userId")
+	user, err := app.users.GetUserDetails(userId)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	app.renderATemplate(w, r, "user.page.html", &templateData{User: user})
+}
