@@ -1,4 +1,4 @@
-# README for CRUD operations for callorytracker web application.
+# Callorytracker Application.
 
 The application provides **CRUD** functionality for users to be able to track their callory intake.
 It allos users to create, retrieve, update and delete the created records.
