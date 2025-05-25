@@ -46,8 +46,13 @@ func main() {
 
 	// Which which environment the application is running and set the configs properly
 
-	if os.Getenv("ENV") == "PRODUCTION" {
-		dsn = os.Getenv("DATABASE_URL")
+	if os.Getenv("ENV") == "PROD" {
+		dbUser = os.Getenv("DBUSER")
+		dbPassword = os.Getenv("DBPASSWORD")
+		dbHost = os.Getenv("DBHOST")
+		dbName = os.Getenv("DBNAME")
+		dbPort = os.Getenv("DBPORT")
+		secret = os.Getenv("SESSION")
 	} else {
 		// Loading env file
 		env, err := helpers.LoadEnv(".env")
