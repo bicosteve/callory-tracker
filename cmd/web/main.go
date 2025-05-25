@@ -56,7 +56,6 @@ func main() {
 		port = os.Getenv("PORT")
 		if port == "" {
 			log.Fatal("Port environment variable not set")
-			port = "4000"
 		}
 	} else {
 		// Loading env file
@@ -83,9 +82,6 @@ func main() {
 
 	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
 		dbUser, dbPassword, dbHost, dbPort, dbName)
-
-	fmt.Printf("Database connection uri ---> %s \n", dsn)
-	fmt.Printf("Application port ---> %s \n", port)
 
 	db, err := db.OpenDB(dsn)
 	if err != nil {
