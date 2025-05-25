@@ -74,12 +74,12 @@ cd callory-tracker
 
 ## 🛠️ Setting the app's db connection configs
 
-DB_USER=your-db-username
-DB_PASS=your-db-password
-DB_HOST=your-db-host:3306
-DB_NAME=your-db-name
-SECRET=your-secret
-PORT=4001 # Heroku sets this automatically in production
+1. DB_USER=your-db-username
+2. DB_PASS=your-db-password
+3. DB_HOST=your-db-host:3306
+4. DB_NAME=your-db-name
+5. SECRET=your-secret
+6. PORT=4001
 
 ---
 
