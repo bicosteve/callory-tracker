@@ -35,31 +35,46 @@ func main() {
 
 	// errorLog: logging info messages
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	var dbUser string
+	var dbName string
+	var dbHost string
+	var dbPassword string
+	var dbPort string
+	var secret string
+	var dsn string
+	var port string
 
-	// Loading env file
-	env, err := helpers.LoadEnv("./env/.env")
-	if err != nil {
-		errorLog.Fatal(err.Error())
+	// Which which environment the application is running and set the configs properly
+
+	if os.Getenv("ENV") == "PRODUCTION" {
+		dsn = os.Getenv("DATABASE_URL")
+	} else {
+		// Loading env file
+		env, err := helpers.LoadEnv(".env")
+		if err != nil {
+			errorLog.Fatal(err.Error())
+		}
+
+		err = godotenv.Load(env)
+		if err != nil {
+			errorLog.Fatal(err.Error())
+		}
+
+		port = os.Getenv("PORT")
+		if port == "" {
+			port = ":4000"
+		}
+
+		dbUser = os.Getenv("DBUSER")
+		dbName = os.Getenv("DBNAME")
+		dbHost = os.Getenv("DBHOST")
+		dbPassword = os.Getenv("DBPASSWORD")
+		dbPort = os.Getenv("DBPORT")
+		secret = os.Getenv("SESSION")
+
 	}
 
-	err = godotenv.Load(env)
-	if err != nil {
-		errorLog.Fatal(err.Error())
-	}
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = ":4000"
-	}
-
-	dbUser := os.Getenv("DBUSER")
-	dbName := os.Getenv("DBNAME")
-	dbHost := os.Getenv("DBHOST")
-	dbPassword := os.Getenv("DBPASSWORD")
-	dbPort := os.Getenv("DBPORT")
-	secret := os.Getenv("SESSION")
-
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
 		dbUser, dbPassword, dbHost, dbPort, dbName)
 
 	db, err := db.OpenDB(dsn)
