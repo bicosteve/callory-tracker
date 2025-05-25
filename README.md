@@ -98,3 +98,22 @@ go mod tidy
 ```bash
 go run ./cmd/web
 ```
+
+## 🛠️ Deployment
+
+```bash
+
+cd /callory-tracker
+
+# Build the binary for Linux (Heroku runs on Linux)
+GOOS=linux GOARCH=amd64 go build -o callory-tracker ./cmd/web
+
+
+heroku create clrytracker
+
+git init
+heroku git:remote -a myapp-name
+git add .
+git commit -m "Deploying callory-tracker"
+git push heroku main
+```
