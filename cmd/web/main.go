@@ -54,6 +54,9 @@ func main() {
 		dbPort = os.Getenv("DBPORT")
 		secret = os.Getenv("SESSION")
 		port = os.Getenv("PORT")
+		if port == "" {
+			port = "4000"
+		}
 	} else {
 		// Loading env file
 		env, err := helpers.LoadEnv(".env")
@@ -67,9 +70,6 @@ func main() {
 		}
 
 		port = os.Getenv("PORT")
-		if port == "" {
-			port = ":4000"
-		}
 
 		dbUser = os.Getenv("DBUSER")
 		dbName = os.Getenv("DBNAME")
@@ -83,8 +83,8 @@ func main() {
 	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
 		dbUser, dbPassword, dbHost, dbPort, dbName)
 
-	fmt.Println("Database connection uri", dsn)
-	fmt.Println("Port", port)
+	fmt.Printf("Database connection uri ---> %s \n", dsn)
+	fmt.Printf("Application port ---> %s \n", port)
 
 	db, err := db.OpenDB(dsn)
 	if err != nil {
@@ -121,7 +121,7 @@ func main() {
 	}
 
 	serve := &http.Server{
-		Addr:         port,
+		Addr:         ":" + port,
 		Handler:      session.Enable(app.routes()), // wraps handlers with session
 		ErrorLog:     errorLog,
 		IdleTimeout:  time.Minute,
