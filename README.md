@@ -38,6 +38,7 @@
 
 ## 📦 Project Structure
 
+```bash
 callory-tracker/
 ├── cmd/
 │ └── web/
@@ -57,6 +58,7 @@ callory-tracker/
 ├── go.sum
 ├── Procfile
 └── README.md
+```
 
 ---
 
