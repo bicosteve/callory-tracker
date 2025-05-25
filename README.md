@@ -36,7 +36,7 @@
 
 ---
 
-## 📦 Project Structure (Simplified)
+## 📦 Project Structure
 
 callory-tracker/
 ├── cmd/
@@ -74,21 +74,25 @@ cd callory-tracker
 
 ## 🛠️ Setting the app's db connection configs
 
-- DB_USER=your-db-username
-- DB_PASS=your-db-password
-- DB_HOST=your-db-host:3306
-- DB_NAME=your-db-name
-- SECRET=your-secret
-- PORT=4001 # Heroku sets this automatically in production
+DB_USER=your-db-username
+DB_PASS=your-db-password
+DB_HOST=your-db-host:3306
+DB_NAME=your-db-name
+SECRET=your-secret
+PORT=4001 # Heroku sets this automatically in production
 
 ---
 
-## 🛠️ Dependancies
+## 🛠️ Installing Dependancies
 
-- go mod tidy
+```bash
+go mod tidy
+```
 
 ---
 
 ## 🛠️ Run the application
 
-- go run ./cmd/web
+```bash
+go run ./cmd/web
+```
