@@ -55,6 +55,7 @@ func main() {
 		secret = os.Getenv("SESSION")
 		port = os.Getenv("PORT")
 		if port == "" {
+			log.Fatal("Port environment variable not set")
 			port = "4000"
 		}
 	} else {
