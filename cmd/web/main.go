@@ -53,6 +53,7 @@ func main() {
 		dbName = os.Getenv("DBNAME")
 		dbPort = os.Getenv("DBPORT")
 		secret = os.Getenv("SESSION")
+		port = os.Getenv("PORT")
 	} else {
 		// Loading env file
 		env, err := helpers.LoadEnv(".env")
@@ -82,15 +83,7 @@ func main() {
 	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
 		dbUser, dbPassword, dbHost, dbPort, dbName)
 
-	_ = dsn
-
-	dsn_two := "if0_39075337:wUKuOXG0lTsPV@tcp(sql103.infinityfree.com:3306)/if0_39075337_calory_tracker_db?parseTime=true"
-
-	_ = dsn_two
-
-	dsn_three := "bicosteve4_bico:x?6s49x5L@tcp(bicosteve4.helioho.st:3306)/bicosteve4_callory_tracker_db?parseTime=true"
-
-	db, err := db.OpenDB(dsn_three)
+	db, err := db.OpenDB(dsn)
 	if err != nil {
 		errorLog.Fatal(err)
 	}
