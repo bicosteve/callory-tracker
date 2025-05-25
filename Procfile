@@ -1,0 +1,1 @@
+web: ./callory-tracker/cmd/web
