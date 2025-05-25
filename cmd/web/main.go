@@ -83,6 +83,9 @@ func main() {
 	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
 		dbUser, dbPassword, dbHost, dbPort, dbName)
 
+	fmt.Println("Database connection uri", dsn)
+	fmt.Println("Port", port)
+
 	db, err := db.OpenDB(dsn)
 	if err != nil {
 		errorLog.Fatal(err)
