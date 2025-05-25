@@ -105,7 +105,7 @@ go run ./cmd/web
 
 cd /callory-tracker
 
-# Build the binary for Linux (Heroku runs on Linux)
+# Build the binary
 GOOS=linux GOARCH=amd64 go build -o callory-tracker ./cmd/web
 
 
