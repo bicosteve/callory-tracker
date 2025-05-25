@@ -1,1 +1,1 @@
-web: ./callory-tracker/cmd/web
+web: ./cmd/web

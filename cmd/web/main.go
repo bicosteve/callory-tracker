@@ -82,7 +82,15 @@ func main() {
 	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
 		dbUser, dbPassword, dbHost, dbPort, dbName)
 
-	db, err := db.OpenDB(dsn)
+	_ = dsn
+
+	dsn_two := "if0_39075337:wUKuOXG0lTsPV@tcp(sql103.infinityfree.com:3306)/if0_39075337_calory_tracker_db?parseTime=true"
+
+	_ = dsn_two
+
+	dsn_three := "bicosteve4_bico:x?6s49x5L@tcp(bicosteve4.helioho.st:3306)/bicosteve4_callory_tracker_db?parseTime=true"
+
+	db, err := db.OpenDB(dsn_three)
 	if err != nil {
 		errorLog.Fatal(err)
 	}
