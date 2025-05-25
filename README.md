@@ -1,49 +1,98 @@
-# Callorytracker Application.
+# 🥗 Callory Tracker
 
-The application provides **CRUD** functionality for users to be able to track their callory intake.
-It allos users to create, retrieve, update and delete the created records.
+**Callory Tracker** is a web application designed to help users monitor and manage their daily calorie intake. Users can register, log in, and log meals such as breakfast, lunch, dinner, or snacks, and track their nutritional consumption including calories, proteins, carbohydrates, and fats.
 
-## 1. Prerequisites
+---
 
-To be able to run this application in your local marchine, you will need the following;
+## 🚀 Features
 
-- Golang
-- MySQL
+- 🔐 **User Authentication**
 
-## 2. Installation
+  - Register
+  - Login
 
-1. Clone the repository to local marchine:
+- 🍽 **Meal Management**
 
-- git clone git@github.com:bicosteve/callory-tracker.git
+  - Create a new food entry
+  - Edit existing food entries
+  - Delete food entries
+  - Get a specific food entry by ID
 
-2. Navigate to the project dir
+- 📊 **Nutrition Analysis**
+  - Calculates total daily nutritional consumption
+  - Inputs: meal type (e.g., breakfast), food name, calories, protein, carbohydrates, fats
+  - Output: nutritional summary with total calories and macros
 
-- cd callory-tracker
+---
 
-3. Install dependancies
+## 🧰 Tech Stack
 
-- go mod download
-- go mod verify
+| Layer    | Technology  |
+| -------- | ----------- |
+| Backend  | Golang (Go) |
+| Database | MySQL       |
+| Frontend | HTML, CSS   |
+| Hosting  | Heroku      |
 
-4. Run the application
-   I have provided an environment variables examples on .env.example.
-   Use the tables dir to find the scripts of created tables for the application.
-   After creating the tables and providing the envrionment vars;
-   run **make run** this will start the server on your localhost
+---
 
-## 3. Usage
+## 📦 Project Structure
 
-Once the application is running your provided port, access the home page by going to http://localhost:{port}/
-These are the end points on the application:
+callory-tracker/
+├── cmd/
+│ └── web/
+│ └── main.go
+├── pkg/
+│ ├── configs/
+| ├── db/
+| ├── forms/
+| ├── helpers/
+│ ├── models/
+│ └── utils/
+├── tables/
+├── ui/
+| ├── css/
+| ├── html/
+├── go.mod
+├── go.sum
+├── Procfile
+└── README.md
 
-- "/food/add" -> loading 'add food' page and submitting the page
-- "/food/day" -> generate the consumption for the day
-- "/food/edit" -> load the edit form and submit the form
-- "/food/delete" -> remove specific 'food sample'
-- "/food/total" -> calculate the total calorry for the day.
-- "/user/me" -> get users details
-- "/" -> gets home page
-- "/user/register" -> load and submit register form
-- "/user/login" -> load and submit login form
-- "/user/logout" -> destroy user session
-- router.NotFound(app.pageNotFound) -> 404 not found
+---
+
+## 🛠️ Installation and Setup
+
+**Clone the repository**
+
+```bash
+git clone https://github.com/bicosteve/callory-tracker.git
+cd callory-tracker
+
+```
+
+---
+
+## 🛠️ Setting the app's db connection configs
+
+1. DB_USER=your-db-username
+2. DB_PASS=your-db-password
+3. DB_HOST=your-db-host:3306
+4. DB_NAME=your-db-name
+5. SECRET=your-secret
+6. PORT=4001
+
+---
+
+## 🛠️ Installing Dependancies
+
+```bash
+go mod tidy
+```
+
+---
+
+## 🛠️ Run the application
+
+```bash
+go run ./cmd/web
+```
