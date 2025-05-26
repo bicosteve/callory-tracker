@@ -6,3 +6,4 @@ ui/.DS_Store
 .env
 *.exe
 *.log
+.idea/
