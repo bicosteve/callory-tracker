@@ -8,8 +8,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bicosteve/callory-tracker/pkg/logger"
 	"github.com/go-sql-driver/mysql"
 )
+
+var Log = logger.Default()
 
 // RegisterTLSConfig registers a custom TLS configuration with the MySQL driver
 // using the CA certificate provided by Aiven (the ca.pem file you download from
@@ -37,24 +40,28 @@ func RegisterTLSConfig(name, caCertPath string) error {
 		MinVersion: tls.VersionTLS12,
 	})
 	if err != nil {
+		Log.Error.Printf("Failed to register TLS config %q: %v", name, err)
 		return fmt.Errorf("could not register TLS config: %w", err)
 	}
 
+	Log.Info.Printf("TLS config %q registered successfully", name)
 	return nil
 }
 
 func OpenDB(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", dsn) // -> initialize connection pools for future use
 	if err != nil {
+		Log.Error.Printf("Failed to open database connection pool: %v", err)
 		return nil, err
 	}
 
 	err = db.Ping()
 	if err != nil {
+		Log.Error.Printf("Database ping failed: %v", err)
 		return nil, err
 	}
 
-	fmt.Println("Connected to db")
+	Log.Info.Println("Connected to db")
 
 	// db.SetConnMaxLifetime(time.Minute * 3)
 	// db.SetMaxOpenConns(10)

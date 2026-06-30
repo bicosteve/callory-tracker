@@ -38,6 +38,7 @@ func newTestApplication(t *testing.T) *application {
 	return &application{
 		errorLog:      log.New(io.Discard, "", 0),
 		infoLog:       log.New(io.Discard, "", 0),
+		warningLog:    log.New(io.Discard, "", 0),
 		foods:         &mock.FoodModel{},
 		users:         &mock.UserModel{},
 		templateCache: templateCache,

@@ -12,6 +12,7 @@ import (
 
 	"github.com/bicosteve/callory-tracker/pkg/db"
 	"github.com/bicosteve/callory-tracker/pkg/helpers"
+	"github.com/bicosteve/callory-tracker/pkg/logger"
 	"github.com/bicosteve/callory-tracker/pkg/models"
 	"github.com/bicosteve/callory-tracker/pkg/models/mysql"
 	"github.com/joho/godotenv"
@@ -20,6 +21,7 @@ import (
 type application struct {
 	errorLog      *log.Logger
 	infoLog       *log.Logger
+	warningLog    *log.Logger
 	foods         models.FoodModelInterface
 	users         models.UserModelInterface
 	templateCache map[string]*template.Template
@@ -31,11 +33,22 @@ type contextKey string
 const contextKeyUser = contextKey("user")
 
 func main() {
-	// infoLog: logging info messages
-	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	// infoLog: logging info messages.
+	// Flags used:
+	//   log.Ldate      -> the date in the local time zone: 2009/01/23
+	//   log.Ltime      -> the time in the local time zone: 01:23:23
+	//   log.Lshortfile -> final file name element and line number: handlers.go:42
+	// This makes every log line show the log type (INFO), date, time and the
+	// affected file with its line number.
+	appLogger := logger.Default()
+	infoLog := appLogger.Info
 
-	// errorLog: logging info messages
-	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	// warningLog: logging non-fatal warnings, prefixed with the log type (WARNING).
+	warningLog := appLogger.Warning
+
+	// errorLog: logging error messages with the same date/time and the
+	// affected file and line number, prefixed with the log type (ERROR).
+	errorLog := appLogger.Error
 	var dbUser string
 	var dbName string
 	var dbHost string
@@ -139,6 +152,7 @@ func main() {
 	app := &application{
 		errorLog:      errorLog,
 		infoLog:       infoLog,
+		warningLog:    warningLog,
 		foods:         &mysql.FoodModel{DB: conn},
 		users:         &mysql.UserModel{DB: conn},
 		templateCache: templateCache,
