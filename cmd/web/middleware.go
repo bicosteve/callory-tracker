@@ -3,9 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
+
 	"github.com/bicosteve/callory-tracker/pkg/models"
 	"github.com/justinas/nosurf"
-	"net/http"
 )
 
 /*
@@ -63,7 +64,7 @@ func noSurf(next http.Handler) http.Handler {
 	csrfHandler.SetBaseCookie(http.Cookie{
 		HttpOnly: true,
 		Path:     "/",
-		Secure:   true,
+		Secure:   false,
 	})
 
 	return csrfHandler
