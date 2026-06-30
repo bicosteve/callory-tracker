@@ -20,6 +20,8 @@ FROM alpine:3.18
 
 WORKDIR /app
 
+RUN apk add --no-cache curl
+
 COPY --from=builder /app/web .
 COPY --from=builder /app/ui ./ui
 

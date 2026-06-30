@@ -34,6 +34,7 @@ func (app *application) routes() http.Handler {
 		r.Get("/user/me", app.getUser)
 	})
 
+	router.Get("/health", app.getHealth)
 	router.Get("/", app.getHome)
 	router.Get("/user/register", app.getRegisterPage)
 	router.Get("/user/login", app.getLoginPage)
