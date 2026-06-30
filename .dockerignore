@@ -1,0 +1,17 @@
+.git
+.github
+.env
+.env.example
+*.db
+*.log
+Dockerfile
+docker-compose*
+node_modules
+callory-tracker
+web
+.gitignore
+README.md
+Procfile
+tables/
+bin/
+callory-tracker

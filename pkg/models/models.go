@@ -9,6 +9,21 @@ var ErrNoRecord = errors.New("models: no matching record found")
 var ErrDuplicateEmail = errors.New("models: user already exists")
 var ErrorInvalidCredentials = errors.New("models: incorrect password or email")
 
+type FoodModelInterface interface {
+	InsertFood(meal string, name string, protein int, carbohydrate int, fat int, calories int, userId int) (int, error)
+	GetFood(foodId, userId int) (*Food, error)
+	GetFoodTotal(userId int, createdAt string) (*Food, error)
+	GetFoods(userId int) ([]*Food, error)
+	UpdateFood(meal string, name string, protein, cabs, fat, calory, foodId, userId int) (int, error)
+	DeleteFood(foodId, userId int) (int, error)
+}
+
+type UserModelInterface interface {
+	RegisterUser(username, email, password string) error
+	LoginUser(email, password string) (int, error)
+	GetUserDetails(id int) (*User, error)
+}
+
 type Food struct {
 	ID            int       `json:"id"`
 	Meal          string    `json:"meal"`

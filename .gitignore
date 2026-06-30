@@ -7,3 +7,6 @@ ui/.DS_Store
 *.exe
 *.log
 .idea/
+*.bin
+callory-tracker
+bin/
