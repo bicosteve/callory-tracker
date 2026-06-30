@@ -1,35 +1,127 @@
 # 🥗 Callory Tracker
 
-**Callory Tracker** is a web application designed to help users monitor and manage their daily calorie intake. Users can register, log in, and log meals such as breakfast, lunch, dinner, or snacks, and track their nutritional consumption including calories, proteins, carbohydrates, and fats.
+[![Go Build & Test](https://github.com/bicosteve/callory-tracker/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/bicosteve/callory-tracker/actions)
+
+> A lightweight, highly performant, server-rendered web application for tracking what you eat and understanding your daily nutrition — built in Go.
+
+---
+
+## 🔗 Live Demo
+
+Experience the live deployment of Callory Tracker here:
+👉 **[Callory Tracker Live Demo](https://callory-tracker.onrender.com)** _(Placeholder link for demo environment)_
+
+---
+
+## 📸 Demo Preview
+
+| Dashboard / Running Daily Summary                                                                                          | Logging a New Meal Entry                                                                                            |
+| -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| ![Dashboard Preview](https://raw.githubusercontent.com/bicosteve/callory-tracker/main/ui/static/dashboard_placeholder.png) | ![Add Food Preview](https://raw.githubusercontent.com/bicosteve/callory-tracker/main/ui/static/add_placeholder.png) |
+
+_(Note: Real screenshots can be committed to the `ui/static/` directory to display them live in your repository)._
+
+---
+
+## 🎯 The Problem It Solves
+
+Most people have no clear idea of how much they actually eat in a day. Calories and macronutrients (protein, carbohydrates, and fat) silently add up across breakfast, lunch, dinner, and snacks — and by the time the effects show up, it's hard to know which habits to change.
+
+Existing calorie-tracking apps are often:
+
+- **Bloated** — packed with intrusive ads, heavy social feeds, and premium paywalls just to log a simple meal.
+- **Privacy-unfriendly** — your deeply personal eating and health habits become marketing data for third parties.
+- **Overly complex** — requiring slow barcode scanners and unreliable food databases for something that should be quick and manual.
+
+**Callory Tracker** solves this with a deliberately simple approach: a fast, secure, self-hostable web app where you log each meal manually with its nutritional values, and instantly see your running daily totals. You own your data, the app stays completely out of your way, and the entire stack is small enough to run on a single inexpensive micro VM.
 
 ---
 
 ## 🚀 Features
 
-- 🔐 **User Authentication**
-  - Register
-  - Login
-
-- 🍽 **Meal Management**
-  - Create a new food entry
-  - Edit existing food entries
-  - Delete food entries
-  - Get a specific food entry by ID
-
-- 📊 **Nutrition Analysis**
-  - Calculates total daily nutritional consumption
-  - Inputs: meal type (e.g., breakfast), food name, calories, protein, carbohydrates, fats
-  - Output: nutritional summary with total calories and macros
+- 🔐 **User Authentication** — Secure registration, login, and logout flow.
+- 🍽 **Meal Management (CRUD)** — Create, read, update, and delete food entries easily.
+- 📊 **Nutrition Analysis** — Automatic aggregation of total daily calories and macronutrients (carbs, protein, fats).
+- 🛡 **Security-first Middleware** — CSRF protection, secure HTTP headers, panic recovery, and request logging.
+- 🩺 **Health Endpoint** — A `/health` route for uptime checks, monitoring, and load balancer ping checks.
+- 🧪 **Test Suite** — Fully test-covered with robust unit tests, helper validations, and mock-backed handler tests.
 
 ---
 
 ## 🧰 Tech Stack
 
-| Layer    | Technology  |
-| -------- | ----------- |
-| Backend  | Golang (Go) |
-| Database | MySQL       |
-| Frontend | HTML, CSS   |
+| Layer      | Technology                                        |
+| ---------- | ------------------------------------------------- |
+| Language   | Go (Golang)                                       |
+| Router     | [chi](https://github.com/go-chi/chi)              |
+| Middleware | [alice](https://github.com/justinas/alice)        |
+| CSRF       | [nosurf](https://github.com/justinas/nosurf)      |
+| Sessions   | golangcollege/sessions                            |
+| Database   | MySQL                                             |
+| Templates  | Go `html/template` (embedded via `embed.FS`)      |
+| Frontend   | Server-rendered HTML + CSS                        |
+| Deployment | Docker, GitHub Actions CI/CD, Contabo VM / Heroku |
+
+---
+
+## 🛡️ Security Notes & Authentication Process
+
+Callory Tracker utilizes industry-standard security patterns to guard user accounts and preserve data privacy:
+
+1. **Password Hashing**: User credentials are protected using the **bcrypt** hashing algorithm with a cost factor of 12, ensuring slow, computationally-expensive defense against brute-force attacks.
+2. **Session Management**: Session authentication is conducted through server-side sessions using encrypted cookie jars (via `golangcollege/sessions`). Cookies are configured with the `HttpOnly`, `Secure`, and `SameSite=Lax` attributes to eliminate Cross-Site Scripting (XSS) session stealing.
+3. **CSRF Protection**: A global **CSRF (Cross-Site Request Forgery)** protection middleware (`nosurf`) wraps all state-changing endpoints. It injects a unique token in each page form and enforces validating incoming POST payloads.
+4. **Secure HTTP Headers**: Custom headers are injected on every response:
+
+- `X-Frame-Options: deny` (Blocks clickjacking)
+- `X-XSS-Protection: 1; mode=block` (Mitigates cross-site scripting)
+- `Content-Type: text/html; charset=utf-8` (Ensures explicit character encoding)
+
+5. **Contextual Scoping**: Handlers retrieve the active user context injected by authentication middleware. Every query for food logging, editing, and summing is tightly scoped using the authenticated User ID, making sure users can **never** view or alter other users' data.
+
+---
+
+## 🏗 Architecture Overview
+
+Callory Tracker follows a clean, idiomatic Go web-app layout that separates HTTP concerns from data access:
+
+- **`cmd/web`** — the application entry point and HTTP layer: routing, handlers, middleware, template caching, and helpers.
+- **`pkg/models`** — domain types (`User`, `Food`) and interfaces (`UserModelInterface`, `FoodModelInterface`) that define the data-access contract. This interface-driven design is what makes the handlers testable with mock implementations.
+- **`pkg/models/mysql`** — the production MySQL implementation of those interfaces.
+- **`pkg/models/mock`** — in-memory mock implementations used by the test suite.
+- **`pkg/forms`** — reusable form parsing and validation (required fields, lengths, email format, password matching).
+- **`pkg/helpers`, `pkg/configs`, `pkg/db`, `pkg/logger`** — supporting utilities for config loading, DB connection pooling, and structured logging.
+- **`ui`** — HTML templates and CSS, embedded directly into the binary via `embed.FS` so the app ships as a single self-contained executable.
+
+Every request passes through a standard middleware chain:
+
+```
+recoverPanic → logRequest → secureHeaders → noSurf (CSRF) → authenticate
+```
+
+Protected routes additionally pass through `requireAuthenticatedUser`, which redirects unauthenticated visitors to the login page.
+
+---
+
+## 🌐 Routes Overview
+
+| Method | Path             | Auth Required | Description                                       |
+| ------ | ---------------- | ------------- | ------------------------------------------------- |
+| GET    | `/`              | No            | Home page / landing                               |
+| GET    | `/health`        | No            | Health check for uptime monitors & load balancers |
+| GET    | `/user/register` | No            | Registration form                                 |
+| POST   | `/user/register` | No            | Register and create a new user account            |
+| GET    | `/user/login`    | No            | Login form                                        |
+| POST   | `/user/login`    | No            | Authenticate user and start session               |
+| POST   | `/user/logout`   | No            | Terminate session and logout                      |
+| GET    | `/user/me`       | Yes           | View profile details of currently logged-in user  |
+| GET    | `/food/add`      | Yes           | Add new food item entry form                      |
+| POST   | `/food/add`      | Yes           | Create a food entry                               |
+| GET    | `/food/day`      | Yes           | View a specific food entry detail                 |
+| GET    | `/food/get-edit` | Yes           | Get form to edit an existing food entry           |
+| POST   | `/food/edit`     | Yes           | Update a food entry                               |
+| POST   | `/food/delete`   | Yes           | Delete a food entry                               |
+| POST   | `/food/total`    | Yes           | Get daily nutrition aggregate summary             |
 
 ---
 
@@ -38,111 +130,150 @@
 ```bash
 callory-tracker/
 ├── cmd/
-│ └── web/
-│ └── main.go
+│ └── web/ # HTTP layer
+│ ├── main.go # Entry point: config, DB, sessions, server
+│ ├── routes.go # Route + middleware wiring (chi + alice)
+│ ├── handlers.go # Request handlers
+│ ├── middleware.go # recoverPanic, logRequest, secureHeaders, auth, CSRF
+│ ├── helper.go # serverError/clientError, template rendering
+│ └── templates.go # Template cache + dynamic data
 ├── pkg/
-│ ├── configs/
-| ├── db/
-| ├── forms/
-| ├── helpers/
-│ ├── models/
-│ └── utils/
-├── tables/
+│ ├── configs/ # Environment/config loading
+│ ├── db/ # MySQL connection pool
+│ ├── forms/ # Form parsing & validation
+│ ├── helpers/ # Shared helper utilities
+│ ├── logger/ # Structured logging
+│ └── models/ # Domain types + interfaces
+│ ├── mysql/ # Production MySQL implementation
+│ └── mock/ # Mock implementations for tests
+├── tables/ # SQL schema (Users.sql, Foods.sql)
 ├── ui/
-| ├── css/
-| ├── html/
-├── go.mod
-├── go.sum
+│ ├── css/ # Stylesheets
+│ ├── html/ # Templates (pages + partials)
+│ └── efs.go # embed.FS for templates & static assets
+├── Dockerfile
+├── docker-compose.prod.yml
+├── Makefile
 ├── Procfile
+├── go.mod / go.sum
 └── README.md
 ```
 
 ---
 
-## 🛠️ Installation and Setup
+## 🛡️ CI/CD Status
 
-**Clone the repository**
+Continuous Integration is set up via **GitHub Actions** (`.github/workflows/ci-cd.yml`).
+On every push to `main` or pull request, the CI/CD pipeline:
+
+1. Provisions a clean runner and installs Go.
+2. Runs code linter and security checks.
+3. Automatically runs all test suites with verbose logging.
+4. Generates a test coverage assessment ensuring zero regression.
+
+---
+
+## 🧪 Testing (How to Run Tests)
+
+The project ships with a robust test suite covering form validation, utility helpers, custom HTTP middleware, and REST handler flows using mock database models. No external database connection is required to run the test suite.
+
+Run tests using standard Go commands:
 
 ```bash
-git clone https://github.com/bicosteve/callory-tracker.git
-cd callory-tracker
+# Run all tests in the project
+go test ./...
 
+# Run tests with verbose output
+go test ./... -v
+
+# Run tests and evaluate test coverage
+go test ./... -cover
+
+# Run a specific test inside a package
+go test -run=TestGetDay ./cmd/web -v
 ```
 
 ---
 
-## 🛠️ Setting the app's db connection configs
+## 🚧 Known Limitations & Future Improvements
 
-1. DB_USER=your-db-username
-2. DB_PASS=your-db-password
-3. DB_HOST=your-db-host:3306
-4. DB_NAME=your-db-name
-5. SECRET=your-secret
-6. PORT=4001
+While functional, simple, and light, the following features are scope for future enhancement:
+
+1. **Session Store Persistence**: Currently uses an in-memory session backing store. If the web server is restarted, all logged-in user sessions are cleared.
+
+- _Improvement_: Transition sessions backend to **Redis** or a schema table in **MySQL**.
+
+2. **Interactive Charting**: Daily macros are calculated and printed as static server-side HTML tables.
+
+- _Improvement_: Add dynamic radial/bar charts utilizing **Chart.js** or light CSS progress meters.
+
+3. **Nutritional Lookup Database**: Users must know and type the macros manually for every dish.
+
+- _Improvement_: Integrate a free public food registry API (such as USDA FoodData or Open Food Facts).
+
+4. **Automated Password Recovery**: User authentication lacks password reset flows (e.g. email reset token generation).
+
+- _Improvement_: Integrate an email gateway service (such as SendGrid or mailgun) to authorize reset tokens.
 
 ---
 
-## 🛠️ Installing Dependancies
+## 🛠️ Local Development Getting Started
+
+### 1. Prerequisites
+
+- Go 1.21+ installed.
+- A running MySQL database.
+
+### 2. Configure Environment
+
+Copy the example environment settings and customize:
+
+```bash
+cp .env.example .env
+```
+
+| Variable  | Description                        | Example          |
+| --------- | ---------------------------------- | ---------------- |
+| `DB_USER` | MySQL username                     | `root`           |
+| `DB_PASS` | MySQL password                     | `secret`         |
+| `DB_HOST` | MySQL host and port                | `localhost:3306` |
+| `DB_NAME` | Database name                      | `callory`        |
+| `SECRET`  | 32-byte key for session encryption | `s3cr3t...`      |
+| `PORT`    | Port the app listens on            | `4001`           |
+
+### 3. Initialize Database Tables
+
+```bash
+mysql -u <user> -p <db_name> < tables/Users.sql
+mysql -u <user> -p <db_name> < tables/Foods.sql
+```
+
+### 4. Build and Run
 
 ```bash
 go mod tidy
-```
-
----
-
-## 🛠️ Run the application
-
-```bash
 go run ./cmd/web
 ```
 
-## 🛠️ Deployment
+Navigate to `http://localhost:4001` to test the application locally.
+
+---
+
+## 🚢 Production Deployment
+
+The binary is fully compatible with containerized environments:
+
+- **Docker**: Build a lightweight container image using the included scratch `Dockerfile`.
+- **Docker Compose**: Production multi-container stacks are detailed in `docker-compose.prod.yml`.
 
 ```bash
-
-cd /callory-tracker
-
-# Build the binary
-GOOS=linux GOARCH=amd64 go build -o callory-tracker ./cmd/web
-
-
-heroku create clrytracker
-
-git init
-heroku git:remote -a myapp-name
-git add .
-git commit -m "Deploying callory-tracker"
-git push heroku main
+# Build & Run Container
+docker build -t callory-tracker .
+docker run --env-file .env -p 4001:4001 callory-tracker
 ```
 
 ---
 
-## 🚀 CI/CD Pipeline & Contabo VM Deployment
+## 📄 License
 
-A fully automated CI/CD pipeline has been set up using **GitHub Actions**.
-
-Whenever code is pushed to the `main` or `master` branches, the pipeline:
-
-1. **Runs Tests**: Executes all unit and handler tests using Go's test runner.
-2. **Builds & Pushes Docker Image**: Packages the application into a Docker image using the multi-stage `Dockerfile` and pushes it to your **Docker Hub** repository.
-3. **Deploys to Contabo VM**: Logs into your remote Contabo virtual machine via SSH, pulls the newly built image, stops/removes any existing container, and starts the container with the required environment variables.
-
-### GitHub Repository Secrets Configuration
-
-To run the pipeline successfully, configure the following secrets under **Settings > Secrets and variables > Actions** in your GitHub repository:
-
-| Secret Name          | Description                                        | Example Value                            |
-| -------------------- | -------------------------------------------------- | ---------------------------------------- |
-| `DOCKERHUB_USERNAME` | Your Docker Hub user name                          | `my_docker_user`                         |
-| `DOCKERHUB_TOKEN`    | A personal access token generated from Docker Hub  | `dckr_pat_...`                           |
-| `CONTABO_HOST`       | Public IP or domain name of your Contabo VM        | `192.168.1.100` or `vm.example.com`      |
-| `CONTABO_USER`       | SSH user used to log in to the Contabo VM          | `root` or `ubuntu`                       |
-| `CONTABO_SSH_KEY`    | Private SSH key matching the public key on your VM | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
-| `CONTABO_SSH_PORT`   | Port for SSH connection                            | `22`                                     |
-| `APP_PORT`           | The port the app runs on (defaults to `4001`)      | `4001`                                   |
-| `DBUSER`             | Production MySQL Database User                     | `production_db_user`                     |
-| `DBPASSWORD`         | Production MySQL Database Password                 | `production_secure_pass`                 |
-| `DBHOST`             | Production MySQL Hostname/IP                       | `production-mysql-db.example.com`        |
-| `DBPORT`             | Production MySQL Database Port                     | `3306`                                   |
-| `DBNAME`             | Production MySQL Database Name                     | `calorie_tracker`                        |
-| `SESSION`            | A 32-byte secret key for session encryption        | `s3cr3t_s3ss10n_k3y_g03s_h3r3_123`      
+This project is licensed under the repository license specifications. Feel free to clone, adapt, and self-host!
