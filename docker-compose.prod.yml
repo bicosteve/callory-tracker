@@ -1,0 +1,22 @@
+services:
+  callory-tracker:
+    image: "${DOCKER_IMAGE:-bixoloo/callory-tracker}:${IMAGE_TAG:-latest}"
+    container_name: callory-tracker
+    restart: unless-stopped
+
+    ports:
+      # this will run behind nginx
+      - "127.0.0.1:${PORT:-4001}:${PORT:-4001}"
+    env_file:
+      - .env
+
+    environment:
+      ENV: prod
+      PORT: ${PORT:-4001}
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:${PORT:-4001}/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s

@@ -12,6 +12,7 @@ import (
 
 	"github.com/bicosteve/callory-tracker/pkg/db"
 	"github.com/bicosteve/callory-tracker/pkg/helpers"
+	"github.com/bicosteve/callory-tracker/pkg/models"
 	"github.com/bicosteve/callory-tracker/pkg/models/mysql"
 	"github.com/joho/godotenv"
 )
@@ -19,8 +20,8 @@ import (
 type application struct {
 	errorLog      *log.Logger
 	infoLog       *log.Logger
-	foods         *mysql.FoodModel
-	users         *mysql.UserModel
+	foods         models.FoodModelInterface
+	users         models.UserModelInterface
 	templateCache map[string]*template.Template
 	session       *sessions.Session
 }
@@ -43,10 +44,12 @@ func main() {
 	var secret string
 	var dsn string
 	var port string
+	var dbSSLMode string
+	var dbCACert string
 
 	// Which which environment the application is running and set the configs properly
 
-	if os.Getenv("ENV") == "PROD" {
+	if os.Getenv("ENV") == "prod" {
 		dbUser = os.Getenv("DBUSER")
 		dbPassword = os.Getenv("DBPASSWORD")
 		dbHost = os.Getenv("DBHOST")
@@ -54,10 +57,13 @@ func main() {
 		dbPort = os.Getenv("DBPORT")
 		secret = os.Getenv("SESSION")
 		port = os.Getenv("PORT")
+		dbSSLMode = os.Getenv("DBSSLMODE")
+		dbCACert = os.Getenv("DBCACERT")
 		if port == "" {
 			log.Fatal("Port environment variable not set")
 		}
 	} else {
+
 		// Loading env file
 		env, err := helpers.LoadEnv(".env")
 		if err != nil {
@@ -77,18 +83,40 @@ func main() {
 		dbPassword = os.Getenv("DBPASSWORD")
 		dbPort = os.Getenv("DBPORT")
 		secret = os.Getenv("SESSION")
+		dbSSLMode = os.Getenv("DBSSLMODE")
+		dbCACert = os.Getenv("DBCACERT")
 
 	}
 
-	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
-		dbUser, dbPassword, dbHost, dbPort, dbName)
+	// Managed MySQL providers require an encrypted connection.
+	// DBSSLMODE controls how TLS is handled:
+	//   - "" or "disable"     -> no TLS (local development)
+	//   - "require"/"true"    -> TLS without verifying the server cert
+	//   - "verify-ca"         -> TLS verified against the Aiven CA cert (DBCACERT)
+	tlsParam := ""
+	switch dbSSLMode {
+	case "", "disable", "false":
+		// no TLS
+	case "verify-ca", "verify-full":
+		// Register a custom TLS config that trusts the Aiven CA certificate.
+		if err := db.RegisterTLSConfig("aiven", dbCACert); err != nil {
+			errorLog.Fatal(err)
+		}
+		tlsParam = "&tls=aiven"
+	default:
+		// "require"/"true"/"skip-verify": encrypt but skip CA verification.
+		tlsParam = "&tls=skip-verify"
+	}
 
-	db, err := db.OpenDB(dsn)
+	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true%s",
+		dbUser, dbPassword, dbHost, dbPort, dbName, tlsParam)
+
+	conn, err := db.OpenDB(dsn)
 	if err != nil {
 		errorLog.Fatal(err)
 	}
 
-	defer db.Close()
+	defer conn.Close()
 	// closes the db connection pool before main func exits
 
 	templateCache, err := newTemplateCache("./ui/html")
@@ -111,8 +139,8 @@ func main() {
 	app := &application{
 		errorLog:      errorLog,
 		infoLog:       infoLog,
-		foods:         &mysql.FoodModel{DB: db},
-		users:         &mysql.UserModel{DB: db},
+		foods:         &mysql.FoodModel{DB: conn},
+		users:         &mysql.UserModel{DB: conn},
 		templateCache: templateCache,
 		session:       session,
 	}
