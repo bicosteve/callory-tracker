@@ -1,4 +1,4 @@
-# 🥗 Callory Tracker
+# Callory Tracker
 
 [![Go Build & Test](https://github.com/bicosteve/callory-tracker/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/bicosteve/callory-tracker/actions)
 
@@ -6,24 +6,22 @@
 
 ---
 
-## 🔗 Live Demo
+## Live Demo
 
 Experience the live demo of Callory Tracker here:
-👉 **[Callory Tracker Live Demo](https://youtu.be/7849vsrTUk4)**
+**[Callory Tracker Live Demo](https://youtu.be/7849vsrTUk4)**
 
 ---
 
-## 📸 Demo Preview
+## Demo Preview
 
 | Dashboard / Running Daily Summary            | Logging a New Meal Entry                  |
 | -------------------------------------------- | ----------------------------------------- |
 | ![Dashboard Preview](./ui/css/dashboard.png) | ![Add Food Preview](./ui/css/addfood.png) |
 
-_(Note: Real screenshots can be committed to the `ui/static/` directory to display them live in your repository)._
-
 ---
 
-## 🎯 The Problem It Solves
+## The Problem It Solves
 
 Most people have no clear idea of how much they actually eat in a day. Calories and macronutrients (protein, carbohydrates, and fat) silently add up across breakfast, lunch, dinner, and snacks — and by the time the effects show up, it's hard to know which habits to change.
 
@@ -37,18 +35,18 @@ Existing calorie-tracking apps are often:
 
 ---
 
-## 🚀 Features
+## Features
 
-- 🔐 **User Authentication** — Secure registration, login, and logout flow.
-- 🍽 **Meal Management (CRUD)** — Create, read, update, and delete food entries easily.
-- 📊 **Nutrition Analysis** — Automatic aggregation of total daily calories and macronutrients (carbs, protein, fats).
-- 🛡 **Security-first Middleware** — CSRF protection, secure HTTP headers, panic recovery, and request logging.
-- 🩺 **Health Endpoint** — A `/health` route for uptime checks, monitoring, and load balancer ping checks.
-- 🧪 **Test Suite** — Fully test-covered with robust unit tests, helper validations, and mock-backed handler tests.
+- **User Authentication** — Secure registration, login, and logout flow.
+- **Meal Management (CRUD)** — Create, read, update, and delete food entries easily.
+- **Nutrition Analysis** — Automatic aggregation of total daily calories and macronutrients (carbs, protein, fats).
+- **Security-first Middleware** — CSRF protection, secure HTTP headers, panic recovery, and request logging.
+- **Health Endpoint** — A `/health` route for uptime checks, monitoring, and load balancer ping checks.
+- **Test Suite** — Fully test-covered with robust unit tests, helper validations, and mock-backed handler tests.
 
 ---
 
-## 🧰 Tech Stack
+## Tech Stack
 
 | Layer      | Technology                                        |
 | ---------- | ------------------------------------------------- |
@@ -64,7 +62,7 @@ Existing calorie-tracking apps are often:
 
 ---
 
-## 🛡️ Security Notes & Authentication Process
+## Security Notes & Authentication Process
 
 Callory Tracker utilizes industry-standard security patterns to guard user accounts and preserve data privacy:
 
@@ -81,7 +79,7 @@ Callory Tracker utilizes industry-standard security patterns to guard user accou
 
 ---
 
-## 🏗 Architecture Overview
+## Architecture Overview
 
 Callory Tracker follows a clean, idiomatic Go web-app layout that separates HTTP concerns from data access:
 
@@ -103,7 +101,7 @@ Protected routes additionally pass through `requireAuthenticatedUser`, which red
 
 ---
 
-## 🌐 Routes Overview
+## Routes Overview
 
 | Method | Path             | Auth Required | Description                                       |
 | ------ | ---------------- | ------------- | ------------------------------------------------- |
@@ -125,7 +123,7 @@ Protected routes additionally pass through `requireAuthenticatedUser`, which red
 
 ---
 
-## 📦 Project Structure
+## Project Structure
 
 ```bash
 callory-tracker/
@@ -161,7 +159,7 @@ callory-tracker/
 
 ---
 
-## 🛡️ CI/CD Status
+## CI/CD Status
 
 Continuous Integration & Deployment is set up via **GitHub Actions** (`.github/workflows/ci-cd.yml`).
 
@@ -171,7 +169,7 @@ Continuous Integration & Deployment is set up via **GitHub Actions** (`.github/w
 
 ---
 
-## 🧪 Testing (How to Run Tests)
+## Testing
 
 The project ships with a robust test suite covering form validation, utility helpers, custom HTTP middleware, and REST handler flows using mock database models. No external database connection is required to run the test suite.
 
@@ -193,7 +191,7 @@ go test -run=TestGetDay ./cmd/web -v
 
 ---
 
-## 🚧 Known Limitations & Future Improvements
+## Known Limitations & Future Improvements
 
 While functional, simple, and light, the following features are scope for future enhancement:
 
@@ -215,7 +213,7 @@ While functional, simple, and light, the following features are scope for future
 
 ---
 
-## 🛠️ Local Development Getting Started
+## Local Development Getting Started
 
 ### 1. Prerequisites
 
@@ -261,7 +259,7 @@ Navigate to `http://localhost:4001` to test the application locally.
 
 ---
 
-## 🚢 Production Deployment
+## Production Deployment
 
 The binary is fully compatible with containerized environments:
 
@@ -276,6 +274,6 @@ docker run --env-file .env -p 4001:4001 callory-tracker
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the repository license specifications. Feel free to clone, adapt, and self-host!
