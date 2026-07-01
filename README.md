@@ -8,8 +8,8 @@
 
 ## 🔗 Live Demo
 
-Experience the live deployment of Callory Tracker here:
-👉 **[Callory Tracker Live Demo](https://callory-tracker.onrender.com)** _(Placeholder link for demo environment)_
+Experience the live demo of Callory Tracker here:
+👉 **[Callory Tracker Live Demo](https://youtu.be/7849vsrTUk4)**
 
 ---
 
@@ -69,7 +69,7 @@ Existing calorie-tracking apps are often:
 Callory Tracker utilizes industry-standard security patterns to guard user accounts and preserve data privacy:
 
 1. **Password Hashing**: User credentials are protected using the **bcrypt** hashing algorithm with a cost factor of 12, ensuring slow, computationally-expensive defense against brute-force attacks.
-2. **Session Management**: Session authentication is conducted through server-side sessions using encrypted cookie jars (via `golangcollege/sessions`). Cookies are configured with the `HttpOnly`, `Secure`, and `SameSite=Lax` attributes to eliminate Cross-Site Scripting (XSS) session stealing.
+2. **Session Management**: Session authentication is conducted through server-side sessions using cookie jars (via `golangcollege/sessions`). Cookies are configured with `HttpOnly` and `SameSite=Strict` (configured as `Secure: false` by default for local development over HTTP).
 3. **CSRF Protection**: A global **CSRF (Cross-Site Request Forgery)** protection middleware (`nosurf`) wraps all state-changing endpoints. It injects a unique token in each page form and enforces validating incoming POST payloads.
 4. **Secure HTTP Headers**: Custom headers are injected on every response:
 
@@ -77,7 +77,7 @@ Callory Tracker utilizes industry-standard security patterns to guard user accou
 - `X-XSS-Protection: 1; mode=block` (Mitigates cross-site scripting)
 - `Content-Type: text/html; charset=utf-8` (Ensures explicit character encoding)
 
-5. **Contextual Scoping**: Handlers retrieve the active user context injected by authentication middleware. Every query for food logging, editing, and summing is tightly scoped using the authenticated User ID, making sure users can **never** view or alter other users' data.
+1. **Contextual Scoping**: Handlers retrieve the active user context injected by authentication middleware. Every query for food logging, editing, and summing is tightly scoped using the authenticated User ID, making sure users can **never** view or alter other users' data.
 
 ---
 
@@ -96,7 +96,7 @@ Callory Tracker follows a clean, idiomatic Go web-app layout that separates HTTP
 Every request passes through a standard middleware chain:
 
 ```
-recoverPanic → logRequest → secureHeaders → noSurf (CSRF) → authenticate
+authenticate → recoverPanic → logRequest → secureHeaders → noSurf (CSRF)
 ```
 
 Protected routes additionally pass through `requireAuthenticatedUser`, which redirects unauthenticated visitors to the login page.
@@ -163,13 +163,11 @@ callory-tracker/
 
 ## 🛡️ CI/CD Status
 
-Continuous Integration is set up via **GitHub Actions** (`.github/workflows/ci-cd.yml`).
-On every push to `main` or pull request, the CI/CD pipeline:
+Continuous Integration & Deployment is set up via **GitHub Actions** (`.github/workflows/ci-cd.yml`).
 
-1. Provisions a clean runner and installs Go.
-2. Runs code linter and security checks.
-3. Automatically runs all test suites with verbose logging.
-4. Generates a test coverage assessment ensuring zero regression.
+- **Test** (on push to `feat/*`, `fix/*`, `main` and PRs to `main`): provisions a clean Ubuntu runner, installs Go 1.20, downloads dependencies, runs `go vet ./...`, then runs the full suite with the race detector (`go test -race -vet=off ./...`).
+- **Build & Push** (on push to `main` only, after tests pass): builds the Docker image with Buildx and pushes it to Docker Hub tagged with both the commit SHA and `latest`.
+- **Deploy** (manual `workflow_dispatch` on `main`): copies `docker-compose.prod.yml` to the VM over SSH and pulls/restarts the stack.
 
 ---
 
@@ -203,15 +201,15 @@ While functional, simple, and light, the following features are scope for future
 
 - _Improvement_: Transition sessions backend to **Redis** or a schema table in **MySQL**.
 
-2. **Interactive Charting**: Daily macros are calculated and printed as static server-side HTML tables.
+1. **Interactive Charting**: Daily macros are calculated and printed as static server-side HTML tables.
 
 - _Improvement_: Add dynamic radial/bar charts utilizing **Chart.js** or light CSS progress meters.
 
-3. **Nutritional Lookup Database**: Users must know and type the macros manually for every dish.
+1. **Nutritional Lookup Database**: Users must know and type the macros manually for every dish.
 
 - _Improvement_: Integrate a free public food registry API (such as USDA FoodData or Open Food Facts).
 
-4. **Automated Password Recovery**: User authentication lacks password reset flows (e.g. email reset token generation).
+1. **Automated Password Recovery**: User authentication lacks password reset flows (e.g. email reset token generation).
 
 - _Improvement_: Integrate an email gateway service (such as SendGrid or mailgun) to authorize reset tokens.
 
@@ -221,7 +219,7 @@ While functional, simple, and light, the following features are scope for future
 
 ### 1. Prerequisites
 
-- Go 1.21+ installed.
+- Go 1.20+ installed.
 - A running MySQL database.
 
 ### 2. Configure Environment
@@ -232,14 +230,18 @@ Copy the example environment settings and customize:
 cp .env.example .env
 ```
 
-| Variable  | Description                        | Example          |
-| --------- | ---------------------------------- | ---------------- |
-| `DB_USER` | MySQL username                     | `root`           |
-| `DB_PASS` | MySQL password                     | `secret`         |
-| `DB_HOST` | MySQL host and port                | `localhost:3306` |
-| `DB_NAME` | Database name                      | `callory`        |
-| `SECRET`  | 32-byte key for session encryption | `s3cr3t...`      |
-| `PORT`    | Port the app listens on            | `4001`           |
+| Variable     | Description                                      | Example               |
+| ------------ | ------------------------------------------------ | --------------------- |
+| `DBUSER`     | MySQL username                                   | `root`                |
+| `DBPASSWORD` | MySQL password                                   | `secret`              |
+| `DBHOST`     | MySQL host                                       | `localhost`           |
+| `DBPORT`     | MySQL port                                       | `3306`                |
+| `DBNAME`     | Database name                                    | `callory`             |
+| `SESSION`    | 32-byte key for session encryption               | `Nrqe6etTZ68Gymwx...` |
+| `PORT`       | Port the app listens on (bare number, no colon)  | `4001`                |
+| `DBSSLMODE`  | Enable TLS to the database (`true`/`false`)      | `false`               |
+| `DBCACERT`   | Path to the CA certificate when `DBSSLMODE=true` | `./ca.pem`            |
+| `ENV`        | Runtime environment (`prod` reads real env vars) | `prod`                |
 
 ### 3. Initialize Database Tables
 
@@ -263,7 +265,7 @@ Navigate to `http://localhost:4001` to test the application locally.
 
 The binary is fully compatible with containerized environments:
 
-- **Docker**: Build a lightweight container image using the included scratch `Dockerfile`.
+- **Docker**: Build a lightweight container image using the included multi-stage `Dockerfile` (built on Alpine Linux).
 - **Docker Compose**: Production multi-container stacks are detailed in `docker-compose.prod.yml`.
 
 ```bash

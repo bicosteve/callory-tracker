@@ -35,6 +35,122 @@ func (app *application) getHome(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func (app *application) getRegisterPage(w http.ResponseWriter, r *http.Request) {
+	app.renderATemplate(w, r, "register.page.html",
+		&templateData{Form: forms.NewForm(nil)})
+}
+
+func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	form := forms.NewForm(r.PostForm)
+	form.Required("username", "email", "password", "confirm_password")
+	form.MaxLength("username", 10)
+	form.MinLength("password", 1)
+	form.ValidateEmail("email", forms.EmailRegex)
+	form.ComparePasswords("password", "confirm_password")
+
+	if !form.Valid() {
+		app.renderATemplate(w, r, "register.page.html", &templateData{Form: form})
+		return
+	}
+
+	username := form.Get("username")
+	email := form.Get("email")
+	password := form.Get("password")
+
+	err = app.users.RegisterUser(username, email, password)
+	if err != nil {
+		app.serverError(w, err)
+		app.session.Put(r, "flash", err)
+		app.errorLog.Println(err)
+		return
+	}
+
+	app.session.Put(r, "flash", "Registered successfully")
+
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+}
+
+func (app *application) getLoginPage(w http.ResponseWriter, r *http.Request) {
+	app.renderATemplate(w, r, "login.page.html",
+		&templateData{Form: forms.NewForm(nil)})
+}
+
+func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		app.serverError(w, err)
+		app.session.Put(r, "flash", err)
+		app.errorLog.Println(err)
+		return
+	}
+
+	form := forms.NewForm(r.PostForm)
+	form.Required("email", "password")
+
+	if !form.Valid() {
+		app.renderATemplate(w, r, "login.page.html", &templateData{Form: form})
+		return
+	}
+
+	email := form.Get("email")
+	password := form.Get("password")
+
+	userId, err := app.users.LoginUser(email, password)
+	if err == models.ErrorInvalidCredentials {
+		form.Errors.Add("generic", "Email or password is incorrect")
+		app.renderATemplate(w, r, "login.page.html", &templateData{Form: form})
+		return
+	}
+
+	if err != nil {
+		app.session.Put(r, "flash", err)
+		app.errorLog.Println(err)
+		app.serverError(w, err)
+		return
+	}
+
+	app.session.Put(r, "flash", "Successfully logged in")
+	app.session.Put(r, "userId", userId)
+
+	http.Redirect(w, r, "/food/add", http.StatusSeeOther)
+}
+
+func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
+	// Use the RenewToken() method on the current session to change session ID.
+	// This is good practise
+
+	// Logout means removing the userId from the session
+	app.session.Remove(r, "userId")
+	app.session.Put(r, "flash", "You have successfully logout")
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+}
+
+func (app *application) getUser(w http.ResponseWriter, r *http.Request) {
+	userId := app.session.GetInt(r, "userId")
+	user, err := app.users.GetUserDetails(userId)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	app.renderATemplate(w, r, "user.page.html", &templateData{User: user})
+}
+
 func (app *application) totalFoodConsumption(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -250,117 +366,6 @@ func (app *application) getDay(w http.ResponseWriter, r *http.Request) {
 	app.renderATemplate(w, r, "day.page.html", &templateData{
 		Food: food,
 	})
-}
-
-func (app *application) getRegisterPage(w http.ResponseWriter, r *http.Request) {
-	app.renderATemplate(w, r, "register.page.html",
-		&templateData{Form: forms.NewForm(nil)})
-}
-
-func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		app.clientError(w, http.StatusMethodNotAllowed)
-		return
-	}
-
-	err := r.ParseForm()
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	form := forms.NewForm(r.PostForm)
-	form.Required("username", "email", "password", "confirm_password")
-	form.MaxLength("username", 10)
-	//form.MinLength("password", 5)
-	form.ValidateEmail("email", forms.EmailRegex)
-	form.ComparePasswords("password", "confirm_password")
-
-	if !form.Valid() {
-		app.renderATemplate(w, r, "register.page.html", &templateData{Form: form})
-		return
-	}
-
-	username := form.Get("username")
-	email := form.Get("email")
-	password := form.Get("password")
-
-	err = app.users.RegisterUser(username, email, password)
-	if err != nil {
-		app.serverError(w, err)
-		app.errorLog.Println(err)
-		return
-	}
-
-	app.session.Put(r, "flash", "Registered successfully")
-
-	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
-}
-
-func (app *application) getLoginPage(w http.ResponseWriter, r *http.Request) {
-	app.renderATemplate(w, r, "login.page.html",
-		&templateData{Form: forms.NewForm(nil)})
-}
-
-func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		app.clientError(w, http.StatusMethodNotAllowed)
-		return
-	}
-
-	err := r.ParseForm()
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	form := forms.NewForm(r.PostForm)
-	form.Required("email", "password")
-
-	if !form.Valid() {
-		app.renderATemplate(w, r, "login.page.html", &templateData{Form: form})
-		return
-	}
-
-	email := form.Get("email")
-	password := form.Get("password")
-
-	userId, err := app.users.LoginUser(email, password)
-	if err == models.ErrorInvalidCredentials {
-		form.Errors.Add("generic", "Email or password is incorrect")
-		app.renderATemplate(w, r, "login.page.html", &templateData{Form: form})
-		return
-	}
-
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	app.session.Put(r, "flash", "Successfully logged in")
-	app.session.Put(r, "userId", userId)
-
-	http.Redirect(w, r, "/food/add", http.StatusSeeOther)
-}
-
-func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
-	// Use the RenewToken() method on the current session to change session ID.
-	// This is good practise
-
-	// Logout means removing the userId from the session
-	app.session.Remove(r, "userId")
-	app.session.Put(r, "flash", "You have successfully logout")
-	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
-}
-
-func (app *application) getUser(w http.ResponseWriter, r *http.Request) {
-	userId := app.session.GetInt(r, "userId")
-	user, err := app.users.GetUserDetails(userId)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	app.renderATemplate(w, r, "user.page.html", &templateData{User: user})
 }
 
 // 404 page not found

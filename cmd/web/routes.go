@@ -19,7 +19,7 @@ func (app *application) routes() http.Handler {
 	// serving static files/css with embed
 	router.Handle("/css/*", fs)
 
-	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, secureHeaders, noSurf, app.authenticate)
+	standardMiddleware := alice.New(app.authenticate, app.recoverPanic, app.logRequest, secureHeaders, noSurf)
 
 	// Only authenticated users can access these routes
 	router.Group(func(r chi.Router) {
