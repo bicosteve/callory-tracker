@@ -15,9 +15,9 @@ Experience the live demo of Callory Tracker here:
 
 ## 📸 Demo Preview
 
-| Dashboard / Running Daily Summary                                                                                          | Logging a New Meal Entry                                                                                            |
-| -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| ![Dashboard Preview](https://raw.githubusercontent.com/bicosteve/callory-tracker/main/ui/static/dashboard_placeholder.png) | ![Add Food Preview](https://raw.githubusercontent.com/bicosteve/callory-tracker/main/ui/static/add_placeholder.png) |
+| Dashboard / Running Daily Summary            | Logging a New Meal Entry                  |
+| -------------------------------------------- | ----------------------------------------- |
+| ![Dashboard Preview](./ui/css/dashboard.png) | ![Add Food Preview](./ui/css/addfood.png) |
 
 _(Note: Real screenshots can be committed to the `ui/static/` directory to display them live in your repository)._
 
