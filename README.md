@@ -274,6 +274,19 @@ docker run --env-file .env -p 4001:4001 callory-tracker
 
 ---
 
+## Production Credentials
+
+You can use these credentials to test the application on production.
+
+```bash
+URL : http://13.140.190.37/
+Username : bixx@gmail.com
+Password : 1234
+
+```
+
+---
+
 ## License
 
 This project is licensed under the repository license specifications. Feel free to clone, adapt, and self-host!
